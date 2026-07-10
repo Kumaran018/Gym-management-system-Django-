@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="row align-items-center justify-content-center min-vh-75">
+    <div class="col-md-8 text-center py-5">
+        <div class="mb-4">
+            <i class="fa-solid fa-dumbbell fa-5x text-primary" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+        </div>
+        <h1 class="display-3 fw-bold mb-3">Muscle Fit Gym</h1>
+        <p class="lead text-muted mb-4 fs-4">A complete, production-grade Gym Management System. Efficiently manage members, trainers, attendance, payments, scheduling, workouts, and diets.</p>
+        
+        <div class="d-flex justify-content-center gap-3">
+            {% if user.is_authenticated %}
+                <a href="#" class="btn btn-premium px-5 py-3 fs-5"><i class="fa-solid fa-dashboard me-2"></i>Go to Dashboard</a>
+            {% else %}
+                <a href="#" class="btn btn-premium px-5 py-3 fs-5"><i class="fa-solid fa-sign-in me-2"></i>Access System Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

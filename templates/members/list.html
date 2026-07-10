@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Members Registry - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-users text-primary me-2"></i>Members Registry</h2>
+        <p class="text-muted m-0 small">Manage and search registered gym members.</p>
+    </div>
+    {% if user.role == 'admin' or user.role == 'receptionist' %}
+        <a href="{% url 'members:add' %}" class="btn btn-premium px-4"><i class="fa-solid fa-user-plus me-2"></i>Register Member</a>
+    {% endif %}
+</div>
+
+<!-- Filters & Search Card -->
+<div class="card card-premium border-0 shadow-sm p-4 mb-4">
+    <form method="GET" class="row g-3">
+        <!-- Search Query input -->
+        <div class="col-md-5">
+            <label class="form-label font-weight-bold text-muted small">Search Member</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search ID, name, phone or email..." value="{{ search_query }}">
+            </div>
+        </div>
+        
+        <!-- Status Filter -->
+        <div class="col-md-3 col-sm-6">
+            <label class="form-label font-weight-bold text-muted small">Status</label>
+            <select name="status" class="form-select bg-light">
+                <option value="">All Statuses</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+                <option value="frozen" {% if status_filter == 'frozen' %}selected{% endif %}>Frozen</option>
+            </select>
+        </div>
+
+        <!-- Gender Filter -->
+        <div class="col-md-3 col-sm-6">
+            <label class="form-label font-weight-bold text-muted small">Gender</label>
+            <select name="gender" class="form-select bg-light">
+                <option value="">All Genders</option>
+                <option value="M" {% if gender_filter == 'M' %}selected{% endif %}>Male</option>
+                <option value="F" {% if gender_filter == 'F' %}selected{% endif %}>Female</option>
+                <option value="O" {% if gender_filter == 'O' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <!-- Filter Action Button -->
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-secondary w-100 py-2.5 rounded-3"><i class="fa-solid fa-filter"></i></button>
+        </div>
+    </form>
+</div>
+
+<!-- Table Card -->
+<div class="card card-premium border-0 shadow-sm p-4">
+    <div class="table-responsive">
+        <table class="table align-middle text-nowrap">
+            <thead class="table-light-head">
+                <tr>
+                    <th>Member ID</th>
+                    <th>Photo</th>
+                    <th>Full Name</th>
+                    <th>Gender</th>
+                    <th>Phone</th>
+                    <th>Join Date</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in page_obj %}
+                <tr>
+                    <td class="fw-bold text-primary">{{ member.member_id }}</td>
+                    <td>
+                        {% if member.user.profile_picture %}
+                            <img src="{{ member.user.profile_picture.url }}" alt="Pic" class="rounded-circle" style="width: 38px; height: 38px; object-fit: cover;">
+                        {% else %}
+                            <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 13px;">
+                                {{ member.user.first_name|slice:":1"|upper }}{{ member.user.last_name|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="fw-semibold text-dark">{{ member.user.get_full_name|default:member.user.username }}</span>
+                        <span class="text-muted d-block small" style="font-size: 11px;">{{ member.user.email }}</span>
+                    </td>
+                    <td>{{ member.get_gender_display }}</td>
+                    <td>{{ member.user.phone|default:member.emergency_contact_phone }}</td>
+                    <td>{{ member.join_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if member.status == 'active' %}
+                            <span class="badge bg-success-subtle text-success text-capitalize">{{ member.status }}</span>
+                        {% elif member.status == 'frozen' %}
+                            <span class="badge bg-info-subtle text-info text-capitalize">{{ member.status }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary text-capitalize">{{ member.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group gap-1">
+                            <a href="{% url 'members:profile' member.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fa-solid fa-eye me-1"></i>View</a>
+                            {% if user.role == 'admin' or user.role == 'receptionist' %}
+                                <a href="{% url 'members:edit' member.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-pen"></i></a>
+                            {% endif %}
+                            {% if user.role == 'admin' %}
+                                <a href="{% url 'members:delete' member.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-trash"></i></a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="fa-solid fa-users fa-3x mb-3 text-light-muted"></i>
+                        <p class="m-0">No matching member records found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if page_obj.has_other_pages %}
+    <nav class="d-flex justify-content-between align-items-center mt-4">
+        <span class="text-muted small">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <ul class="pagination pagination-sm m-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">Prev</a></li>
+            {% endif %}
+            
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if gender_filter %}&gender={{ gender_filter }}{% endif %}">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

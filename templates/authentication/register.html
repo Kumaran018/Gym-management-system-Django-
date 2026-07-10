@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Registration - Muscle Fit Gym</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Outfit', 'Inter', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: #f8f9fa;
+            padding: 40px 20px;
+        }
+        .register-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .register-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .register-logo i {
+            font-size: 40px;
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .register-logo h3 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 23, 42, 0.8);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            color: #fff;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+            opacity: 0.95;
+        }
+        .input-group-text {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            border-radius: 10px;
+        }
+        .form-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #38bdf8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+        .form-select option {
+            background: #1e293b;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <div class="register-logo">
+            <i class="fa-solid fa-dumbbell"></i>
+            <h3>Muscle Fit Gym Onboarding</h3>
+            <p class="text-muted small">Create your account to access the Member Portal</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-3 small mb-4 py-2" role="alert">
+                {% for error in form.non_field_errors %}
+                    <i class="fa-solid fa-circle-exclamation me-2"></i>{{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Section 1: User Account Credentials -->
+            <div class="form-section-title"><i class="fa-solid fa-key me-2"></i>Account Credentials</div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" name="username" required id="id_username" class="form-control" placeholder="Enter username" value="{{ form.username.value|default:'' }}">
+                    </div>
+                    {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_email" class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" name="email" required id="id_email" class="form-control" placeholder="Enter email" value="{{ form.email.value|default:'' }}">
+                    </div>
+                    {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_first_name" class="form-label">First Name</label>
+                    <input type="text" name="first_name" required id="id_first_name" class="form-control" placeholder="Enter first name" value="{{ form.first_name.value|default:'' }}">
+                    {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_last_name" class="form-label">Last Name</label>
+                    <input type="text" name="last_name" required id="id_last_name" class="form-control" placeholder="Enter last name" value="{{ form.last_name.value|default:'' }}">
+                    {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" name="password" required id="id_password" class="form-control" placeholder="Create password">
+                    </div>
+                    {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_confirm_password" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" name="confirm_password" required id="id_confirm_password" class="form-control" placeholder="Retype password">
+                    </div>
+                    {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Section 2: Personal & Emergency Contact Details -->
+            <div class="form-section-title"><i class="fa-solid fa-id-card me-2"></i>Personal Profile details</div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="id_phone" class="form-label">Phone Number</label>
+                    <input type="text" name="phone" required id="id_phone" class="form-control" placeholder="E.g., 555-0100" value="{{ form.phone.value|default:'' }}">
+                    {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="id_gender" class="form-label">Gender</label>
+                    <select name="gender" id="id_gender" class="form-select">
+                        <option value="M" {% if form.gender.value == 'M' %}selected{% endif %}>Male</option>
+                        <option value="F" {% if form.gender.value == 'F' %}selected{% endif %}>Female</option>
+                        <option value="O" {% if form.gender.value == 'O' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="id_date_of_birth" class="form-label">Date of Birth</label>
+                    <input type="date" name="date_of_birth" required id="id_date_of_birth" class="form-control" value="{{ form.date_of_birth.value|default:'' }}">
+                    {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_address" class="form-label">Residential Address</label>
+                <textarea name="address" id="id_address" class="form-control" rows="2" placeholder="Street, City, Zipcode">{{ form.address.value|default:'' }}</textarea>
+                {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_emergency_contact_name" class="form-label">Emergency Contact Name</label>
+                    <input type="text" name="emergency_contact_name" required id="id_emergency_contact_name" class="form-control" placeholder="E.g. Parent/Spouse Name" value="{{ form.emergency_contact_name.value|default:'' }}">
+                    {% if form.emergency_contact_name.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_name.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="id_emergency_contact_phone" class="form-label">Emergency Contact Phone</label>
+                    <input type="text" name="emergency_contact_phone" required id="id_emergency_contact_phone" class="form-control" placeholder="Emergency contact number" value="{{ form.emergency_contact_phone.value|default:'' }}">
+                    {% if form.emergency_contact_phone.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_phone.errors.0 }}</div>{% endif %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-register mt-3 mb-3">
+                Complete Onboarding & Join <i class="fa-solid fa-user-plus ms-2"></i>
+            </button>
+
+            <div class="text-center mt-2 small text-muted">
+                Already have an account? <a href="{% url 'authentication:login' %}" class="text-sky-400 fw-bold">Sign In Here</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

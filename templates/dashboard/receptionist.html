@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Receptionist Dashboard - Antigravity Gym{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-premium p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #0284c7 0%, #075985 100%); color: white;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="fw-extrabold m-0 text-white">Reception Operations Desk</h2>
+                    <p class="text-sky-100 m-0 mt-1 text-light-muted">Welcome, {{ user.get_full_name|default:user.username }}. Ready to assist members today?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Desk Stats Counters -->
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+    <!-- Active Members Counter -->
+    <div class="col">
+        <div class="card card-premium border-0 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="metric-icon bg-success-subtle text-success rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-users fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Active Members</h6>
+                    <h3 class="fw-bold m-0 mt-1 text-success">{{ active_members }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today Attendance -->
+    <div class="col">
+        <div class="card card-premium border-0 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="metric-icon bg-primary-subtle text-primary rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-fingerprint fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Today's Presence</h6>
+                    <h3 class="fw-bold m-0 mt-1 text-primary">{{ today_attendance }} Checked-In</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unpaid Invoices -->
+    <div class="col">
+        <div class="card card-premium border-0 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="metric-icon bg-warning-subtle text-warning rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-circle-exclamation fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Pending Payments</h6>
+                    <h3 class="fw-bold m-0 mt-1 text-warning">{{ pending_payments_count }} Invoices</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-4"><i class="fa-solid fa-bolt text-accent me-2"></i>Quick Desk Actions</h5>
+            <div class="row row-cols-2 row-cols-md-4 g-3">
+                <div class="col">
+                    <a href="#" class="btn btn-outline-primary py-3 w-100 rounded-3 d-flex flex-column align-items-center gap-2">
+                        <i class="fa-solid fa-user-plus fa-2x"></i>
+                        <span class="fw-semibold small">Register Member</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="#" class="btn btn-outline-success py-3 w-100 rounded-3 d-flex flex-column align-items-center gap-2">
+                        <i class="fa-solid fa-circle-dollar-to-slot fa-2x"></i>
+                        <span class="fw-semibold small">Collect Payment</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="#" class="btn btn-outline-info py-3 w-100 rounded-3 d-flex flex-column align-items-center gap-2">
+                        <i class="fa-solid fa-fingerprint fa-2x"></i>
+                        <span class="fw-semibold small">Check-In Member</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <a href="#" class="btn btn-outline-warning py-3 w-100 rounded-3 d-flex flex-column align-items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate fa-2x"></i>
+                        <span class="fw-semibold small">Renew Subscription</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Desk Recent Registrations -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-primary me-2"></i>Recently Registered Members</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light-head">
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in recent_members %}
+                        <tr>
+                            <td class="fw-bold text-primary">{{ member.member_id }}</td>
+                            <td>{{ member.user.get_full_name|default:member.user.username }}</td>
+                            <td>{{ member.get_gender_display }}</td>
+                            <td>{{ member.emergency_contact_phone }}</td>
+                            <td>{{ member.join_date }}</td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success text-capitalize">{{ member.status }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No registered members found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

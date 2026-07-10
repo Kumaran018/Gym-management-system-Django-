@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Payment - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'payments:payment_history' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Ledger
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-circle-dollar-to-slot text-primary me-2"></i>Record Member Payment
+            </h4>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Select Member</label>
+                    {{ form.member }}
+                    {% if form.member.errors %}<div class="text-danger small mt-1">{{ form.member.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Subscription Plan Association</label>
+                    {{ form.membership }}
+                    {% if form.membership.errors %}<div class="text-danger small mt-1">{{ form.membership.errors.0 }}</div>{% endif %}
+                    <small class="text-muted">Links this payment to an active plan registered to this user.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Payment Amount (₹)</label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}<div class="text-danger small mt-1">{{ form.amount.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Payment Channel</label>
+                        {{ form.payment_method }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Invoice Status</label>
+                        {{ form.payment_status }}
+                    </div>
+                </div>
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Record Transaction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

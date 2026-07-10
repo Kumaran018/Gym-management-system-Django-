@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}My Subscription Plans - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header -->
+    <div class="col-12">
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-address-card text-primary me-2"></i>My Subscriptions</h2>
+        <p class="text-muted small">Manage your membership plans and activate packages at Muscle Fit Gym.</p>
+    </div>
+
+    <!-- Active plan -->
+    <div class="col-lg-7">
+        <!-- Active Package Card -->
+        <div class="card card-premium border-0 shadow-sm p-4 mb-4">
+            <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-circle-check me-2"></i>Active Gym Plan</h5>
+            {% if current_membership %}
+                <div class="row align-items-center g-3">
+                    <div class="col-sm-6">
+                        <h4 class="fw-extrabold text-success m-0">{{ current_membership.plan.name }}</h4>
+                        <span class="text-muted small">Subscription Tier</span>
+                    </div>
+                    <div class="col-sm-6 text-sm-end">
+                        <span class="text-muted small d-block">Duration Dates:</span>
+                        <span class="fw-semibold text-danger">{{ current_membership.start_date|date:"M d, Y" }} - {{ current_membership.end_date|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning border-0 small m-0 text-center py-4" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x mb-2 text-warning"></i>
+                    <p class="m-0 fw-bold">No active plan found. Select a gym package below to activate your account!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Billing Membership log History -->
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-clock-rotate-left me-2"></i>Membership Subscription History</h5>
+            <div class="table-responsive">
+                <table class="table align-middle text-nowrap">
+                    <thead class="table-light-head">
+                        <tr>
+                            <th>Package</th>
+                            <th>Amount Paid</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hist in membership_history %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ hist.plan.name }}</td>
+                            <td class="fw-bold text-success">₹{{ hist.paid_price }}</td>
+                            <td>{{ hist.start_date|date:"M d, Y" }}</td>
+                            <td>{{ hist.end_date|date:"M d, Y" }}</td>
+                            <td>
+                                {% if hist.status == 'active' %}
+                                    <span class="badge bg-success-subtle text-success text-capitalize">{{ hist.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary text-capitalize">{{ hist.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">No previous subscription plans logged.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Plan Subscriptions Selector Catalog -->
+    <div class="col-lg-5">
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-tags me-2"></i>Activate Subscription</h5>
+            <p class="text-muted small mb-4">Choose a package to subscribe to. Activating a new package will automatically replace your current active package.</p>
+            
+            <div class="row row-cols-1 g-3">
+                {% for plan in available_plans %}
+                    <div class="col">
+                        <div class="card bg-light border-0 p-3 rounded-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="fw-bold text-dark m-0">{{ plan.name }}</h6>
+                                <h5 class="fw-bold text-primary m-0">₹{{ plan.price }}</h5>
+                            </div>
+                            <p class="text-muted small m-0 mb-3" style="font-size: 11px;">Duration: {{ plan.duration_months }} Month{{ plan.duration_months|pluralize }}<br>{{ plan.description|default:"All gym facilities access." }}</p>
+                            
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ plan.pk }}">
+                                <button type="submit" class="btn btn-premium btn-sm w-100 py-2">
+                                    <i class="fa-solid fa-circle-play me-1"></i>Subscribe & Activate
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center text-muted py-3">No plans active at this time. Contact gym reception.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

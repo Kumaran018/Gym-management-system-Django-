@@ -1,0 +1,138 @@
+<div class="sidebar" id="sidebar-wrapper">
+    <!-- Sidebar Header (Logo) -->
+    <div class="sidebar-brand">
+        <h4 class="m-0 text-dark fw-bold d-flex align-items-center">
+            <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 me-2" style="width: 38px; height: 38px;">
+                <i class="fa-solid fa-dumbbell"></i>
+            </span>
+            <span>Muscle Fit Gym</span>
+        </h4>
+    </div>
+    
+    <!-- Sidebar Menu Options -->
+    <div class="list-group list-group-flush py-3 flex-grow-1" style="overflow-y: auto;">
+        <!-- ROLE: ADMIN / SUPERUSER -->
+        {% if user.role == 'admin' or user.is_superuser %}
+            <div class="sidebar-label text-uppercase text-muted small">Admin Panel</div>
+            <a href="{% url 'dashboard:admin_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'admin_home' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-chart-pie"></i></span>Dashboard
+            </a>
+            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action {% if '/members/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-users"></i></span>Members
+            </a>
+            <a href="{% url 'trainers:list' %}" class="list-group-item list-group-item-action {% if '/trainers/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-tie"></i></span>Trainers
+            </a>
+            <a href="{% url 'authentication:receptionist_list' %}" class="list-group-item list-group-item-action {% if '/receptionists/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-gear"></i></span>Receptionists
+            </a>
+            <a href="{% url 'membership:plan_list' %}" class="list-group-item list-group-item-action {% if '/membership/plans/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-address-card"></i></span>Plans
+            </a>
+            <a href="{% url 'attendance:daily_attendance' %}" class="list-group-item list-group-item-action {% if '/attendance/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>Attendance
+            </a>
+            <a href="{% url 'payments:payment_history' %}" class="list-group-item list-group-item-action {% if '/payments/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-credit-card"></i></span>Payments
+            </a>
+            <a href="{% url 'reports:reports_index' %}" class="list-group-item list-group-item-action {% if '/reports/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-invoice-dollar"></i></span>Reports
+            </a>
+            <a href="{% url 'dashboard:system_settings' %}" class="list-group-item list-group-item-action {% if '/settings/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-sliders"></i></span>Settings
+            </a>
+            
+        <!-- ROLE: RECEPTIONIST -->
+        {% elif user.role == 'receptionist' %}
+            <div class="sidebar-label text-uppercase text-muted small">Reception Desk</div>
+            <a href="{% url 'dashboard:reception_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'reception_home' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-desktop"></i></span>Overview
+            </a>
+            <a href="{% url 'members:add' %}" class="list-group-item list-group-item-action {% if '/members/add/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-plus"></i></span>Register Member
+            </a>
+            <a href="{% url 'payments:record_payment' %}" class="list-group-item list-group-item-action {% if '/payments/record/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-arrows-rotate"></i></span>Renew Membership
+            </a>
+            <a href="{% url 'payments:record_payment' %}" class="list-group-item list-group-item-action {% if '/payments/record/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-circle-dollar-to-slot"></i></span>Collect Payments
+            </a>
+            <a href="{% url 'attendance:daily_attendance' %}" class="list-group-item list-group-item-action {% if '/attendance/daily/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-fingerprint"></i></span>Mark Attendance
+            </a>
+            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'list' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-magnifying-glass"></i></span>Search Members
+            </a>
+
+        <!-- ROLE: TRAINER -->
+        {% elif user.role == 'trainer' %}
+            <div class="sidebar-label text-uppercase text-muted small">Trainer Hub</div>
+            <a href="{% url 'dashboard:trainer_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'trainer_home' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-dumbbell"></i></span>Overview
+            </a>
+            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-users-rectangle"></i></span>My Members
+            </a>
+            <a href="{% url 'workouts:workout_list' %}" class="list-group-item list-group-item-action {% if '/workouts/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-prescription"></i></span>Workout Programs
+            </a>
+            <a href="{% url 'diets:diet_list' %}" class="list-group-item list-group-item-action {% if '/diets/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-utensils"></i></span>Diet Templates
+            </a>
+            <a href="{% url 'attendance:attendance_history' %}" class="list-group-item list-group-item-action {% if '/attendance/history/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-clipboard-list"></i></span>Member Attendance
+            </a>
+
+        <!-- ROLE: MEMBER -->
+        {% elif user.role == 'member' %}
+            <div class="sidebar-label text-uppercase text-muted small">Member Zone</div>
+            <a href="{% url 'dashboard:member_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'member_home' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-user"></i></span>My Dashboard
+            </a>
+            <a href="{% url 'membership:member_plan_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'member_plan_list' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-address-card"></i></span>My Plan
+            </a>
+            <a href="{% url 'attendance:attendance_history' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'attendance_history' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>Attendance
+            </a>
+            <a href="{% url 'workouts:workout_list' %}" class="list-group-item list-group-item-action {% if '/workouts/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-person-running"></i></span>My Workouts
+            </a>
+            <a href="{% url 'diets:diet_list' %}" class="list-group-item list-group-item-action {% if '/diets/' in request.path %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-apple-whole"></i></span>Nutrition Diet
+            </a>
+            <a href="{% url 'payments:payment_history' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'payment_history' %}active{% endif %}">
+                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-invoice"></i></span>Payment History
+            </a>
+        {% endif %}
+        
+        <!-- Shared Space Menu -->
+        <div class="sidebar-label text-uppercase text-muted small">Shared Space</div>
+        <a href="{% url 'core:general_dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'general_dashboard' %}active{% endif %}">
+            <span class="menu-icon-wrapper"><i class="fa-solid fa-list-check"></i></span>Gym Catalog
+        </a>
+    </div>
+
+    <!-- Bottom User profile widget -->
+    {% if user.is_authenticated %}
+    <div class="sidebar-profile d-flex align-items-center gap-3">
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
+        {% else %}
+            <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 14px;">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+        {% endif %}
+        <div class="overflow-hidden flex-grow-1" style="line-height: 1.2;">
+            <h6 class="m-0 text-dark fw-bold text-truncate" style="font-size: 13px;">{{ user.get_full_name|default:user.username }}</h6>
+            <small class="text-muted text-truncate d-block" style="font-size: 11px;">{{ user.email|default:"No logged email" }}</small>
+        </div>
+        <form action="{% url 'authentication:logout' %}" method="post" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Logout" style="padding: 0 !important; background: transparent;">
+                <i class="fa-solid fa-right-from-bracket fa-lg"></i>
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>

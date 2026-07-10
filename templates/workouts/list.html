@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Workout Programs - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-person-running text-primary me-2"></i>Workout Programs</h2>
+        <p class="text-muted m-0 small">Assigned routine plans and custom exercise checklists.</p>
+    </div>
+    {% if user.role == 'admin' or user.role == 'trainer' %}
+        <a href="{% url 'workouts:workout_add' %}" class="btn btn-premium px-4"><i class="fa-solid fa-plus me-2"></i>Create Workout Plan</a>
+    {% endif %}
+</div>
+
+<!-- List of Workout Plans -->
+<div class="row g-4">
+    {% for plan in workout_plans %}
+        <div class="col-12">
+            <div class="card card-premium border-0 shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2">
+                    <div>
+                        <h4 class="fw-bold text-primary m-0">Workout Plan for {{ plan.member.user.get_full_name }}</h4>
+                        <span class="text-muted small">Coach: <strong>{{ plan.trainer.user.get_full_name|default:"General Trainer" }}</strong></span>
+                    </div>
+                    <div class="text-sm-end">
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill mb-1">
+                            <i class="fa-solid fa-calendar me-1"></i>{{ plan.start_date|date:"M d" }} - {{ plan.end_date|date:"M d, Y" }}
+                        </span>
+                        {% if user.role == 'admin' or user.role == 'trainer' %}
+                            <div class="d-block mt-2">
+                                <a href="{% url 'workouts:workout_edit' plan.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'workouts:workout_delete' plan.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                {% if plan.notes %}
+                    <div class="p-3 rounded-3 bg-light border-start border-3 border-primary small mb-3">
+                        <strong>Coaching Notes:</strong> {{ plan.notes }}
+                    </div>
+                {% endif %}
+
+                <!-- Exercises table -->
+                <h6 class="fw-bold text-uppercase small text-muted mb-2">Exercise Routine List:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr class="table-light-head small" style="font-size: 11px;">
+                                <th>Exercise</th>
+                                <th>Category</th>
+                                <th class="text-center">Sets</th>
+                                <th class="text-center">Reps</th>
+                                <th class="text-center">Weight</th>
+                                <th class="text-center">Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            {% for ex in plan.exercises.all %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ ex.name }}</td>
+                                    <td class="text-capitalize">{{ ex.category }}</td>
+                                    <td class="text-center">{{ ex.sets }}</td>
+                                    <td class="text-center">{% if ex.reps %}{{ ex.reps }}{% else %}-{% endif %}</td>
+                                    <td class="text-center">{% if ex.weight_kg %}{{ ex.weight_kg }} kg{% else %}-{% endif %}</td>
+                                    <td class="text-center">{% if ex.duration_minutes %}{{ ex.duration_minutes }} min{% else %}-{% endif %}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-2">No exercises configured in this plan yet.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-dumbbell fa-3x mb-3 text-light-muted"></i>
+            <p>No workout programs assigned.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

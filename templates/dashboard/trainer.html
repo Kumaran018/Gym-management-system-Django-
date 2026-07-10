@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainer Dashboard - Antigravity Gym{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-premium p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); color: white;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="fw-extrabold m-0 text-white">Trainer Coaching Dashboard</h2>
+                    <p class="text-indigo-100 m-0 mt-1 text-light-muted">Welcome, {{ user.get_full_name|default:user.username }}. Ready to customize training programs?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Trainer Bio Card -->
+    <div class="col-md-5">
+        <div class="card card-premium border-0 shadow-sm p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-address-card text-indigo me-2"></i>My Profile</h5>
+            <div class="text-center py-2">
+                <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center bg-indigo text-white mx-auto mb-3" style="width: 80px; height: 80px; font-size: 32px;">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <h5 class="fw-bold m-0">{{ user.get_full_name|default:user.username }}</h5>
+                <p class="text-muted small">{{ trainer.specialization|default:"Fitness Trainer" }}</p>
+            </div>
+            <hr class="border-light-subtle">
+            <div class="row small g-2 px-1">
+                <div class="col-6 text-muted">Experience:</div>
+                <div class="col-6 fw-bold text-end">{{ trainer.experience_years }} Years</div>
+                <div class="col-6 text-muted">Availability:</div>
+                <div class="col-6 fw-bold text-end text-truncate" title="{{ trainer.availability }}">{{ trainer.availability }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trainer Stats Card -->
+    <div class="col-md-7">
+        <div class="card card-premium border-0 shadow-sm p-4 h-100 d-flex flex-column justify-content-between">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-accent me-2"></i>Coaching Metrics</h5>
+            <div class="row g-3 my-auto">
+                <div class="col-6">
+                    <div class="p-3 border rounded-3 text-center bg-light-subtle">
+                        <i class="fa-solid fa-users text-indigo fa-2x mb-2"></i>
+                        <h4 class="fw-bold m-0">{{ assigned_members_count }}</h4>
+                        <small class="text-muted">Assigned Members</small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 border rounded-3 text-center bg-light-subtle">
+                        <i class="fa-solid fa-person-running text-success fa-2x mb-2"></i>
+                        <h4 class="fw-bold m-0">{{ assigned_members_count }}</h4>
+                        <small class="text-muted">Active Programs</small>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="#" class="btn btn-premium w-100 py-2"><i class="fa-solid fa-circle-plus me-2"></i>Create New Workout Template</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trainees List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-users-rectangle text-primary me-2"></i>Assigned Members</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light-head">
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in assigned_members %}
+                        <tr>
+                            <td class="fw-bold text-primary">{{ member.member_id }}</td>
+                            <td>{{ member.user.get_full_name|default:member.user.username }}</td>
+                            <td>{{ member.get_gender_display }}</td>
+                            <td>{{ member.address|default:"-" }}</td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success text-capitalize">{{ member.status }}</span>
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-outline-indigo me-1"><i class="fa-solid fa-person-running me-1"></i>Workout</a>
+                                <a href="#" class="btn btn-sm btn-outline-success"><i class="fa-solid fa-apple-whole me-1"></i>Diet</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No members assigned to your coaching plan yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

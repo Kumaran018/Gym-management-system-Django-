@@ -1,0 +1,139 @@
+{% extends base_template %}
+
+{% block title %}General Catalog - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-premium p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="fw-extrabold m-0 text-white"><i class="fa-solid fa-list-check me-2 text-primary"></i>Gym Available Catalog</h2>
+                    <p class="text-slate-300 m-0 mt-1">Explore all training facilities, equipment sets, and available classes at Muscle Fit Gym.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Metrics Grid -->
+<div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+    <div class="col">
+        <div class="card card-premium border-0 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="metric-icon bg-success-subtle text-success rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-circle-check fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Operational Categories</h6>
+                    <h3 class="fw-bold m-0 mt-1 text-success">{{ total_equipments }} Categories Active</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card card-premium border-0 h-100">
+            <div class="card-body p-4 d-flex align-items-center">
+                <div class="metric-icon bg-warning-subtle text-warning rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-screwdriver-wrench fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Under Maintenance</h6>
+                    <h3 class="fw-bold m-0 mt-1 text-warning">{{ maintenance_equipments }} Items Servicing</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Category Filter Navigation Pills -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card card-premium border-0 p-3 shadow-sm">
+            <div class="d-flex flex-wrap gap-2 justify-content-center" id="filter-pills">
+                <button class="btn btn-primary px-4 py-2 rounded-pill fw-semibold filter-btn active" data-filter="all">All Items</button>
+                <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold filter-btn" data-filter="cardio">Cardio</button>
+                <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold filter-btn" data-filter="strength">Strength</button>
+                <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold filter-btn" data-filter="studio">Studio Classes</button>
+                <button class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-semibold filter-btn" data-filter="accessories">Accessories</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Catalog Cards Grid -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="inventory-grid">
+    {% for item in items %}
+        <div class="col inventory-item" data-category="{{ item.category }}">
+            <div class="card card-premium border-0 h-100">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-secondary-subtle text-secondary text-capitalize px-3 py-1.5 rounded-pill small-badge">
+                                {{ item.get_category_display }}
+                            </span>
+                            {% if item.status == 'available' %}
+                                <span class="badge bg-success-subtle text-success px-3 py-1.5 rounded-pill"><i class="fa-solid fa-check-circle me-1"></i>Available</span>
+                            {% else %}
+                                <span class="badge bg-warning-subtle text-warning px-3 py-1.5 rounded-pill"><i class="fa-solid fa-clock-rotate-left me-1"></i>Tuning...</span>
+                            {% endif %}
+                        </div>
+                        <h4 class="fw-bold mb-2">{{ item.name }}</h4>
+                        <p class="text-muted small mb-3">{{ item.description|default:"No description provided for this catalog item." }}</p>
+                    </div>
+                    <div class="border-top pt-3 mt-2 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted"><i class="fa-solid fa-cubes me-1"></i>Stock Quantity:</span>
+                        <span class="badge bg-dark px-3 py-1.5 text-white fs-6">{{ item.quantity }} units</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-boxes-stacked fa-3x mb-3 text-light-muted"></i>
+            <p>No inventory items registered in the gym catalog yet.</p>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Inline Javascript Filtering Actions -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const items = document.querySelectorAll(".inventory-item");
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            // Remove active classes
+            filterButtons.forEach(b => {
+                b.classList.remove("btn-primary");
+                b.classList.add("btn-outline-secondary");
+            });
+
+            // Set active class
+            this.classList.remove("btn-outline-secondary");
+            this.classList.add("btn-primary");
+
+            const filterValue = this.getAttribute("data-filter");
+
+            items.forEach(item => {
+                const itemCategory = item.getAttribute("data-category");
+                
+                if (filterValue === "all" || itemCategory === filterValue) {
+                    item.style.display = "block";
+                    // Add subtle fade-in transition
+                    item.style.opacity = 0;
+                    setTimeout(() => {
+                        item.style.transition = "opacity 0.3s ease";
+                        item.style.opacity = 1;
+                    }, 50);
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

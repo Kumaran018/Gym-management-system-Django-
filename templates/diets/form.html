@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Diet Plan - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'diets:diet_list' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Diets
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-apple-whole text-primary me-2"></i>{{ action }} Diet Nutrition Plan
+            </h4>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Assignees -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Target Member</label>
+                        {{ form.member }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Assigned Coach</label>
+                        {{ form.trainer }}
+                    </div>
+                </div>
+
+                <!-- Durations -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                </div>
+
+                <!-- Calories and Macros -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3 col-6">
+                        <label class="form-label font-weight-bold text-muted small">Target Calories (kcal)</label>
+                        {{ form.daily_calories }}
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label font-weight-bold text-muted small">Protein (g)</label>
+                        {{ form.protein_g }}
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label font-weight-bold text-muted small">Carbs (g)</label>
+                        {{ form.carbs_g }}
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <label class="form-label font-weight-bold text-muted small">Fats (g)</label>
+                        {{ form.fat_g }}
+                    </div>
+                </div>
+
+                <!-- Schedule Area -->
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Daily Meal Schedule</label>
+                    {{ form.meal_schedule }}
+                    <small class="text-muted">{{ form.meal_schedule.help_text }}</small>
+                </div>
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Diet Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

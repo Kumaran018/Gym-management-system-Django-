@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Receptionist - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'authentication:receptionist_list' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Staff
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-user-plus text-primary me-2"></i>{{ action }} Receptionist Account
+            </h4>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Email Address</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Phone Number</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Profile Image</label>
+                    {{ form.profile_picture }}
+                </div>
+
+                {% if action == 'Add' %}
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Default Password</label>
+                    <input type="text" name="password" class="form-control" value="receptionist123" required>
+                    <small class="text-muted">Set temporary credentials for the receptionist staff.</small>
+                </div>
+                {% endif %}
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainers Directory - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-user-tie text-primary me-2"></i>Coaching Staff</h2>
+        <p class="text-muted m-0 small">Manage and view specialized coaches and trainers.</p>
+    </div>
+    {% if user.role == 'admin' %}
+        <a href="{% url 'trainers:add' %}" class="btn btn-premium px-4"><i class="fa-solid fa-user-plus me-2"></i>Add Trainer</a>
+    {% endif %}
+</div>
+
+<!-- Search Bar -->
+<div class="card card-premium border-0 shadow-sm p-3 mb-4">
+    <form method="GET" class="d-flex gap-2">
+        <input type="text" name="search" class="form-control bg-light border-0" placeholder="Search specialization or coach name..." value="{{ search_query }}">
+        <button type="submit" class="btn btn-primary px-4">Search</button>
+    </form>
+</div>
+
+<!-- Grid Cards Layout -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for trainer in trainers %}
+        <div class="col">
+            <div class="card card-premium border-0 h-100 shadow-sm">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <!-- Profile Header -->
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            {% if trainer.user.profile_picture %}
+                                <img src="{{ trainer.user.profile_picture.url }}" alt="Trainer Pic" class="rounded-circle shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
+                            {% else %}
+                                <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 55px; height: 55px; font-size: 20px;">
+                                    {{ trainer.user.first_name|slice:":1"|upper }}{{ trainer.user.last_name|slice:":1"|upper }}
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="fw-bold m-0 text-dark">{{ trainer.user.get_full_name|default:trainer.user.username }}</h5>
+                                <span class="badge bg-primary-subtle text-primary px-3 rounded-pill text-capitalize mt-1">{{ trainer.specialization }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Bio info -->
+                        <div class="small text-muted mb-4 mt-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><i class="fa-solid fa-graduation-cap me-2 text-primary"></i>Experience:</span>
+                                <span class="fw-semibold text-dark">{{ trainer.experience_years }} Years</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><i class="fa-solid fa-clock me-2 text-success"></i>Hours / Availability:</span>
+                                <span class="fw-semibold text-dark text-truncate" style="max-width: 150px;" title="{{ trainer.availability }}">{{ trainer.availability }}</span>
+                            </div>
+                            {% if user.role == 'admin' %}
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><i class="fa-solid fa-sack-dollar me-2 text-warning"></i>Salary:</span>
+                                <span class="fw-semibold text-success">₹{{ trainer.salary }}/mo</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Action links -->
+                    <div class="border-top pt-3 d-flex justify-content-between align-items-center flex-wrap gap-1">
+                        <a href="{% url 'trainers:members' trainer.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fa-solid fa-users me-1"></i>Clients</a>
+                        {% if user.role == 'admin' %}
+                            <div class="btn-group gap-1">
+                                <a href="{% url 'trainers:edit' trainer.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'trainers:delete' trainer.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-trash"></i></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-user-ninja fa-3x mb-3 text-light-muted"></i>
+            <p>No trainers registered in the catalog.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

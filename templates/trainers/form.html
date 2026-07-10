@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Trainer - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'trainers:list' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Coaches
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-user-plus text-primary me-2"></i>{{ action }} Trainer Account
+            </h4>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row">
+                    <!-- Section A: Account Details -->
+                    <div class="col-md-6 border-end border-light-subtle pe-md-4">
+                        <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-key me-2"></i>Account & Identity</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Username</label>
+                            {{ user_form.username }}
+                            {% if user_form.username.errors %}<div class="text-danger small mt-1">{{ user_form.username.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small">First Name</label>
+                                {{ user_form.first_name }}
+                                {% if user_form.first_name.errors %}<div class="text-danger small mt-1">{{ user_form.first_name.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small">Last Name</label>
+                                {{ user_form.last_name }}
+                                {% if user_form.last_name.errors %}<div class="text-danger small mt-1">{{ user_form.last_name.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Email Address</label>
+                            {{ user_form.email }}
+                            {% if user_form.email.errors %}<div class="text-danger small mt-1">{{ user_form.email.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Contact Phone</label>
+                            {{ user_form.phone }}
+                            {% if user_form.phone.errors %}<div class="text-danger small mt-1">{{ user_form.phone.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Profile Image</label>
+                            {{ user_form.profile_picture }}
+                        </div>
+
+                        {% if action == 'Add' %}
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Default Password</label>
+                            <input type="text" name="password" class="form-control" value="trainer123" required>
+                            <small class="text-muted">Set temporary credentials for the coach.</small>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Section B: Trainer Specs -->
+                    <div class="col-md-6 ps-md-4 mt-4 mt-md-0">
+                        <h5 class="fw-bold text-success mb-3"><i class="fa-solid fa-circle-check me-2"></i>Trainer Specifications</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Specialization</label>
+                            {{ trainer_form.specialization }}
+                            {% if trainer_form.specialization.errors %}<div class="text-danger small mt-1">{{ trainer_form.specialization.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small">Salary (₹)</label>
+                                {{ trainer_form.salary }}
+                                {% if trainer_form.salary.errors %}<div class="text-danger small mt-1">{{ trainer_form.salary.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small">Years of Experience</label>
+                                {{ trainer_form.experience_years }}
+                                {% if trainer_form.experience_years.errors %}<div class="text-danger small mt-1">{{ trainer_form.experience_years.errors.0 }}</div>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold text-muted small">Availability Hours</label>
+                            {{ trainer_form.availability }}
+                            {% if trainer_form.availability.errors %}<div class="text-danger small mt-1">{{ trainer_form.availability.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Trainer Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

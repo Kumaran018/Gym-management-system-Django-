@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Notification Center - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-bell text-primary me-2"></i>Notification Center</h2>
+        <p class="text-muted m-0 small">Keep track of your gym membership updates, workouts, and payments.</p>
+    </div>
+    {% if notifications %}
+        <a href="{% url 'notifications:mark_all_as_read' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+            <i class="fa-solid fa-check-double me-1"></i>Mark all as read
+        </a>
+    {% endif %}
+</div>
+
+<!-- Notifications list container -->
+<div class="card card-premium border-0 shadow-sm p-4">
+    <div class="list-group list-group-flush">
+        {% for notif in notifications %}
+            <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-3 py-3 border-bottom bg-transparent {% if not notif.is_read %}fw-bold{% endif %}">
+                <div class="d-flex align-items-start gap-3">
+                    <!-- Icon based on type -->
+                    <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;">
+                        {% if notif.notification_type == 'expiry' %}
+                            <i class="fa-solid fa-hourglass-end text-danger"></i>
+                        {% elif notif.notification_type == 'payment' %}
+                            <i class="fa-solid fa-receipt text-success"></i>
+                        {% elif notif.notification_type == 'welcome' %}
+                            <i class="fa-solid fa-handshake text-info"></i>
+                        {% elif notif.notification_type == 'trainer' %}
+                            <i class="fa-solid fa-user-check text-warning"></i>
+                        {% else %}
+                            <i class="fa-solid fa-envelope text-primary"></i>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <h6 class="m-0 text-dark {% if not notif.is_read %}fw-extrabold{% endif %}">{{ notif.title }}</h6>
+                        <p class="text-muted small m-0 mt-1 font-weight-normal">{{ notif.message }}</p>
+                        <span class="text-slate-400 small" style="font-size: 10px;">{{ notif.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+
+                <div>
+                    {% if not notif.is_read %}
+                        <a href="{% url 'notifications:mark_as_read' notif.pk %}" class="btn btn-sm btn-light rounded-pill px-3">Mark as read</a>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill">Read</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-bell-slash fa-3x mb-3 text-light-muted"></i>
+                <p class="m-0">No notifications found.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

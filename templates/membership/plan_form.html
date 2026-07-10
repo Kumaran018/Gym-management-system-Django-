@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Membership Plan - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'membership:plan_list' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Plans
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-tags text-primary me-2"></i>{{ action }} Membership Subscription Plan
+            </h4>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Plan Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Price (₹)</label>
+                        {{ form.price }}
+                        {% if form.price.errors %}<div class="text-danger small mt-1">{{ form.price.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Duration (Months)</label>
+                        {{ form.duration_months }}
+                        {% if form.duration_months.errors %}<div class="text-danger small mt-1">{{ form.duration_months.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold text-muted small">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_active }}
+                    <label class="form-check-label font-weight-bold text-muted small ms-2" for="id_is_active">Make Plan Active (Available for sale)</label>
+                </div>
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

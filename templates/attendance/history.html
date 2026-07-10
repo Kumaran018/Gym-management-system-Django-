@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Logs - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Attendance Logs</h2>
+        <p class="text-muted m-0 small">Audit history of gym visits.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'attendance:daily_attendance' %}" class="btn btn-primary btn-sm px-3 rounded-pill"><i class="fa-solid fa-fingerprint me-1"></i>Mark Attendance</a>
+    </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="card card-premium border-0 shadow-sm p-3 mb-4">
+    <form method="GET" class="row g-2">
+        <div class="col-md-6">
+            <input type="text" name="search" class="form-control bg-light border-0" placeholder="Search by member name or ID..." value="{{ search_query }}">
+        </div>
+        <div class="col-md-4">
+            <input type="date" name="date" class="form-control bg-light border-0" value="{{ date_query }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-secondary w-100 py-2">Filter Logs</button>
+        </div>
+    </form>
+</div>
+
+<!-- Logs Table -->
+<div class="card card-premium border-0 shadow-sm p-4">
+    <div class="table-responsive">
+        <table class="table align-middle text-nowrap">
+            <thead class="table-light-head">
+                <tr>
+                    <th>Date</th>
+                    <th>Member ID</th>
+                    <th>Member Name</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance_logs %}
+                <tr>
+                    <td class="fw-semibold text-dark">{{ record.date|date:"l, M d, Y" }}</td>
+                    <td class="fw-bold text-primary">{{ record.member.member_id }}</td>
+                    <td>{{ record.member.user.get_full_name }}</td>
+                    <td><span class="text-success"><i class="fa-solid fa-right-to-bracket me-1"></i>{{ record.check_in_time|time:"h:i A" }}</span></td>
+                    <td>
+                        {% if record.check_out_time %}
+                            <span class="text-danger"><i class="fa-solid fa-right-from-bracket me-1"></i>{{ record.check_out_time|time:"h:i A" }}</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.status == 'present' %}
+                            <span class="badge bg-success-subtle text-success">Present</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger">Absent</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5">
+                        <i class="fa-solid fa-receipt fa-3x mb-3 text-light-muted"></i>
+                        <p class="m-0">No attendance entries found for the selected query.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

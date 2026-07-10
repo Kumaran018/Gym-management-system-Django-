@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Workout Plan - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'workouts:workout_list' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to Routines
+            </a>
+        </div>
+
+        <div class="card card-premium border-0 shadow-sm p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="fa-solid fa-person-running text-primary me-2"></i>{{ action }} Workout Program Plan
+            </h4>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Parent Plan Details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Target Member</label>
+                        {{ form.member }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Assigned Coach</label>
+                        {{ form.trainer }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold text-muted small">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label font-weight-bold text-muted small">Coaching Advice / Notes</label>
+                        {{ form.notes }}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Inline Exercises Formset -->
+                <h5 class="fw-bold text-success mb-3"><i class="fa-solid fa-list-check me-2"></i>Exercises Checklist</h5>
+                {{ formset.management_form }}
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle">
+                        <thead class="table-light">
+                            <tr class="small text-muted">
+                                <th>Exercise Name</th>
+                                <th>Category</th>
+                                <th style="width: 80px;">Sets</th>
+                                <th style="width: 80px;">Reps</th>
+                                <th style="width: 100px;">Weight (kg)</th>
+                                <th style="width: 100px;">Duration (min)</th>
+                                <th class="text-center" style="width: 60px;">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ex_form in formset %}
+                                <tr>
+                                    <!-- Form IDs and hidden elements -->
+                                    {% for hidden in ex_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                    
+                                    <td>{{ ex_form.name }}</td>
+                                    <td>{{ ex_form.category }}</td>
+                                    <td>{{ ex_form.sets }}</td>
+                                    <td>{{ ex_form.reps }}</td>
+                                    <td>{{ ex_form.weight_kg }}</td>
+                                    <td>{{ ex_form.duration_minutes }}</td>
+                                    <td class="text-center">
+                                        {% if formset.can_delete %}
+                                            {{ ex_form.DELETE }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="border-top pt-4 mt-4 text-end">
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Save Workout Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

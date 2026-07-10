@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}System Analytical Reports - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card card-premium p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+            <h2 class="fw-extrabold m-0 text-white"><i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>Central Reports Dashboard</h2>
+            <p class="text-slate-300 m-0 mt-1">Cross-system data analysis of Muscle Fit Gym operations for {{ year }}.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Grid metrics overview -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
+    <!-- Total YTD Revenue -->
+    <div class="col">
+        <div class="card card-premium border-0 p-4 h-100">
+            <h6 class="text-muted text-uppercase small m-0 font-weight-bold">YTD Cleared Revenue</h6>
+            <h3 class="fw-bold m-0 mt-2 text-success">₹{{ ytd_revenue }}</h3>
+            <p class="text-muted small m-0 mt-1">Cleared invoice amounts YTD.</p>
+        </div>
+    </div>
+    
+    <!-- Pending Receivables -->
+    <div class="col">
+        <div class="card card-premium border-0 p-4 h-100">
+            <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Outstanding Invoices</h6>
+            <h3 class="fw-bold m-0 mt-2 text-warning">₹{{ pending_revenue }}</h3>
+            <p class="text-muted small m-0 mt-1">Pending payments logged.</p>
+        </div>
+    </div>
+
+    <!-- Active Members count -->
+    <div class="col">
+        <div class="card card-premium border-0 p-4 h-100">
+            <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Active Members</h6>
+            <h3 class="fw-bold m-0 mt-2 text-primary">{{ active_members }} / {{ total_members }}</h3>
+            <p class="text-muted small m-0 mt-1">Currently active members.</p>
+        </div>
+    </div>
+
+    <!-- Today Checked in -->
+    <div class="col">
+        <div class="card card-premium border-0 p-4 h-100">
+            <h6 class="text-muted text-uppercase small m-0 font-weight-bold">Today Attendance</h6>
+            <h3 class="fw-bold m-0 mt-2 text-info">{{ today_checkins }} Visits</h3>
+            <p class="text-muted small m-0 mt-1">Check-in visits logged today.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Panel: Members breakdown -->
+    <div class="col-lg-6">
+        <div class="card card-premium border-0 shadow-sm p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-primary me-2"></i>Member Status Summary</h5>
+            <div class="list-group list-group-flush mt-2">
+                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent py-3">
+                    <span class="text-dark"><i class="fa-solid fa-user-check me-2 text-success"></i>Active Members</span>
+                    <span class="badge bg-success-subtle text-success fs-6 rounded-pill px-3">{{ active_members }}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent py-3">
+                    <span class="text-dark"><i class="fa-solid fa-snowflake me-2 text-info"></i>Frozen Subscriptions</span>
+                    <span class="badge bg-info-subtle text-info fs-6 rounded-pill px-3">{{ frozen_members }}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent py-3">
+                    <span class="text-dark"><i class="fa-solid fa-user-xmark me-2 text-danger"></i>Inactive Accounts</span>
+                    <span class="badge bg-danger-subtle text-danger fs-6 rounded-pill px-3">{{ inactive_members }}</span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent py-3">
+                    <span class="text-dark"><i class="fa-solid fa-user-tie me-2 text-secondary"></i>Coaching Staff Total</span>
+                    <span class="badge bg-secondary-subtle text-secondary fs-6 rounded-pill px-3">{{ total_trainers }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Plans popularity list -->
+    <div class="col-lg-6">
+        <div class="card card-premium border-0 shadow-sm p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-address-card text-success me-2"></i>Plan Popularity Statistics</h5>
+            <div class="list-group list-group-flush mt-2">
+                {% for item in plans_distribution %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent py-3">
+                        <span class="text-dark font-weight-bold">{{ item.plan_name }}</span>
+                        <span class="badge bg-success text-white fs-6 rounded-pill px-3 py-1.5">{{ item.count }} active subscribers</span>
+                    </div>
+                {% empty %}
+                    <div class="text-center text-muted py-4">No membership plans popularities logged.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Diet Programs - Muscle Fit Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h2 class="fw-bold m-0"><i class="fa-solid fa-apple-whole text-primary me-2"></i>Diet & Nutrition Plans</h2>
+        <p class="text-muted m-0 small">Assigned calorie and macro nutrition schedules.</p>
+    </div>
+    {% if user.role == 'admin' or user.role == 'trainer' %}
+        <a href="{% url 'diets:diet_add' %}" class="btn btn-premium px-4"><i class="fa-solid fa-plus me-2"></i>Create Diet Plan</a>
+    {% endif %}
+</div>
+
+<!-- List of Diet Plans -->
+<div class="row g-4">
+    {% for plan in diet_plans %}
+        <div class="col-md-6 col-12">
+            <div class="card card-premium border-0 shadow-sm p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2">
+                        <div>
+                            <h5 class="fw-bold text-primary m-0">Diet for {{ plan.member.user.get_full_name }}</h5>
+                            <span class="text-muted small">Coach: <strong>{{ plan.trainer.user.get_full_name|default:"General Coach" }}</strong></span>
+                        </div>
+                        <div class="text-sm-end">
+                            <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill mb-1 d-inline-block">
+                                <i class="fa-solid fa-calendar me-1"></i>{{ plan.start_date|date:"M d" }} - {{ plan.end_date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Calories and Macros -->
+                    <div class="card p-3 bg-light border-0 small rounded-3 mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Target Calories:</span>
+                            <span class="fw-bold text-success">{{ plan.daily_calories }} kcal</span>
+                        </div>
+                        <div class="row text-center border-top pt-2 mt-2 font-weight-bold">
+                            <div class="col-4 border-end small"><span class="d-block text-success">{{ plan.protein_g }}g</span>Protein</div>
+                            <div class="col-4 border-end small"><span class="d-block text-info">{{ plan.carbs_g }}g</span>Carbs</div>
+                            <div class="col-4 small"><span class="d-block text-warning">{{ plan.fat_g }}g</span>Fats</div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule text -->
+                    <h6 class="fw-bold text-uppercase small text-muted mb-2">Meal Schedule Details:</h6>
+                    <p class="small text-muted mb-4" style="white-space: pre-line;">{{ plan.meal_schedule.schedule|default:"No active meal plans entered." }}</p>
+                </div>
+
+                <!-- Admin/Trainer actions -->
+                {% if user.role == 'admin' or user.role == 'trainer' %}
+                    <div class="border-top pt-3 text-end">
+                        <a href="{% url 'diets:diet_edit' plan.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1"><i class="fa-solid fa-pen"></i></a>
+                        <a href="{% url 'diets:diet_delete' plan.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fa-solid fa-apple-whole fa-3x mb-3 text-light-muted"></i>
+            <p>No diet programs assigned.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
