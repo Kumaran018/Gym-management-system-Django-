@@ -23,9 +23,12 @@ class MemberForm(forms.ModelForm):
     emergency_contact_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Emergency Contact Name'}))
     emergency_contact_phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Emergency Contact Phone'}))
 
+    height_cm = forms.DecimalField(required=False, max_digits=5, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Height in cm (e.g. 178)'}))
+    weight_kg = forms.DecimalField(required=False, max_digits=5, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Weight in kg (e.g. 74)'}))
+
     class Meta:
         model = Member
-        fields = ['gender', 'date_of_birth', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'medical_notes', 'status', 'assigned_trainer']
+        fields = ['gender', 'date_of_birth', 'height_cm', 'weight_kg', 'address', 'emergency_contact_name', 'emergency_contact_phone', 'medical_notes', 'status', 'assigned_trainer']
         widgets = {
             'gender': forms.Select(attrs={'class': 'form-select'}),
             'status': forms.Select(attrs={'class': 'form-select'}),

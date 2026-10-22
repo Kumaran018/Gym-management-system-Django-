@@ -1,69 +1,332 @@
 {% extends 'base.html' %}
 
-{% block title %}Diet Programs - Muscle Fit Gym{% endblock %}
+{% block title %}Nutrition & Diet Plans - Muscle n Fitness{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h2 class="fw-bold m-0"><i class="fa-solid fa-apple-whole text-primary me-2"></i>Diet & Nutrition Plans</h2>
-        <p class="text-muted m-0 small">Assigned calorie and macro nutrition schedules.</p>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(189, 247, 43, 0.12); display: flex; align-items: center; justify-content: center; color: #bdf72b;">
+                <i class="fa-solid fa-apple-whole"></i>
+            </div>
+            <h2 class="fw-bold m-0" style="color: #ffffff; font-size: 22px;">Nutrition & Diet Plans</h2>
+            <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: #bdf72b; font-weight: 700; border-radius: 9999px; padding: 5px 12px; font-size: 11px;">
+                {{ diet_plans|length }} Active Meal Plan
+            </span>
+        </div>
+        <p class="text-muted m-0 small">Caloric intake, protein, carbs, and fats calibrated scientifically according to your measured height, body weight, and BMI.</p>
     </div>
-    {% if user.role == 'admin' or user.role == 'trainer' %}
-        <a href="{% url 'diets:diet_add' %}" class="btn btn-premium px-4"><i class="fa-solid fa-plus me-2"></i>Create Diet Plan</a>
-    {% endif %}
+    <div class="d-flex gap-2">
+        <button class="btn btn-premium px-4" data-bs-toggle="modal" data-bs-target="#biometricsDietModal">
+            <i class="fa-solid fa-weight-scale me-2"></i>Measure & Assign by Height / Weight
+        </button>
+        {% if user.role == 'admin' or user.role == 'trainer' %}
+            <a href="{% url 'diets:diet_add' %}" class="btn btn-outline-secondary px-3 rounded-pill">
+                <i class="fa-solid fa-plus me-1"></i>Custom Diet Plan
+            </a>
+        {% endif %}
+    </div>
 </div>
+
+<!-- Physical Measurements & BMI Assessment Banner -->
+{% if user.role == 'member' and user.member_profile %}
+<div class="card card-premium p-4 mb-4" style="background: linear-gradient(135deg, #15181e, #11141b); border: 1px solid rgba(189, 247, 43, 0.25); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+    <div class="row g-3 align-items-center">
+        <div class="col-12 col-md-4 border-end-md" style="border-color: rgba(255,255,255,0.08) !important;">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 50px; height: 50px; border-radius: 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 22px;">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase fw-bold" style="font-size: 11px; letter-spacing: 0.05em;">Your Nutrition Profile</span>
+                    <h5 class="fw-bold m-0" style="color: #ffffff;">{{ user.get_full_name|default:user.username }}</h5>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 11px; border-radius: 9999px; padding: 3px 10px; margin-top: 4px;">
+                        {{ user.member_profile.recommended_focus }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-5">
+            <div class="row g-2 text-center">
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">Height</span>
+                        <span class="fw-bold" style="color: #ffffff; font-size: 16px;">{{ user.member_profile.height_cm|default:"--" }} cm</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">Weight</span>
+                        <span class="fw-bold" style="color: #bdf72b; font-size: 16px;">{{ user.member_profile.weight_kg|default:"--" }} kg</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">BMI Index</span>
+                        <span class="fw-bold" style="color: #06b6d4; font-size: 16px;">{{ user.member_profile.bmi|default:"--" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3 text-md-end">
+            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 w-100" data-bs-toggle="modal" data-bs-target="#biometricsDietModal">
+                <i class="fa-solid fa-sliders me-1" style="color: #bdf72b;"></i>Recalculate Macros
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- List of Diet Plans -->
 <div class="row g-4">
     {% for plan in diet_plans %}
-        <div class="col-md-6 col-12">
-            <div class="card card-premium border-0 shadow-sm p-4 h-100 d-flex flex-column justify-content-between">
+        <div class="col-12">
+            <div class="card card-premium p-4 h-100 d-flex flex-column justify-content-between" style="background: #15181e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
                 <div>
                     <!-- Header -->
-                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2">
-                        <div>
-                            <h5 class="fw-bold text-primary m-0">Diet for {{ plan.member.user.get_full_name }}</h5>
-                            <span class="text-muted small">Coach: <strong>{{ plan.trainer.user.get_full_name|default:"General Coach" }}</strong></span>
+                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3 flex-wrap gap-2" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(189, 247, 43, 0.1)); border: 1px solid rgba(189, 247, 43, 0.3); display: flex; align-items: center; justify-content: center; color: #bdf72b; font-size: 18px;">
+                                <i class="fa-solid fa-utensils"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <h5 class="fw-bold m-0" style="color: #ffffff; font-size: 17px;">
+                                        Diet Plan for {{ plan.member.user.get_full_name|default:plan.member.user.username }}
+                                    </h5>
+                                    {% if user == plan.member.user %}
+                                        <span class="badge" style="background: #bdf72b; color: #090b0e; font-weight: 800; font-size: 10px; border-radius: 9999px; padding: 4px 10px;">
+                                            <i class="fa-solid fa-star me-1"></i>ASSIGNED TO YOU
+                                        </span>
+                                    {% endif %}
+                                    {% if plan.member.height_cm and plan.member.weight_kg %}
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700; font-size: 10.5px; border-radius: 9999px; padding: 4px 10px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                                            <i class="fa-solid fa-calculator me-1"></i>Calibrated for {{ plan.member.height_cm }} cm / {{ plan.member.weight_kg }} kg (BMI {{ plan.member.bmi }})
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="text-muted small">
+                                        <i class="fa-solid fa-user-tie me-1" style="color: #bdf72b;"></i>Coach: <strong style="color: #e5e7eb;">{{ plan.trainer.user.get_full_name|default:"Nutrition Specialist" }}</strong>
+                                    </span>
+                                    <span class="text-muted small">•</span>
+                                    <span class="text-muted small">
+                                        <i class="fa-solid fa-id-badge me-1"></i>{{ plan.member.member_id }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-sm-end">
-                            <span class="badge bg-secondary-subtle text-secondary px-3 py-1.5 rounded-pill mb-1 d-inline-block">
-                                <i class="fa-solid fa-calendar me-1"></i>{{ plan.start_date|date:"M d" }} - {{ plan.end_date|date:"M d, Y" }}
+
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #9ca3af; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 9999px; padding: 6px 12px; font-size: 11px;">
+                                <i class="fa-regular fa-calendar-days me-1" style="color: #bdf72b;"></i>{{ plan.start_date|date:"M d" }} &ndash; {{ plan.end_date|date:"M d, Y" }}
+                            </span>
+                            {% if user.role == 'admin' or user.role == 'trainer' %}
+                                <a href="{% url 'diets:diet_edit' plan.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="{% url 'diets:diet_delete' plan.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1" style="border-color: rgba(244, 63, 94, 0.4); color: #f43f5e;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Calories and Macros Dashboard -->
+                    <div class="p-3 rounded-3 mb-3" style="background: #11141a; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted small fw-semibold">
+                                <i class="fa-solid fa-fire me-1" style="color: #f97316;"></i>Calculated Daily Caloric Target:
+                            </span>
+                            <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: #bdf72b; font-size: 15px; font-weight: 800; padding: 7px 16px; border-radius: 9999px; border: 1px solid rgba(189, 247, 43, 0.3);">
+                                {{ plan.daily_calories }} kcal / day
                             </span>
                         </div>
+
+                        <!-- Macro Grid -->
+                        <div class="row g-2 text-center">
+                            <div class="col-4">
+                                <div class="p-2 rounded-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+                                    <span class="d-block fw-bold" style="color: #10b981; font-size: 20px;">{{ plan.protein_g }}g</span>
+                                    <span class="text-muted" style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Protein</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 rounded-3" style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2);">
+                                    <span class="d-block fw-bold" style="color: #06b6d4; font-size: 20px;">{{ plan.carbs_g }}g</span>
+                                    <span class="text-muted" style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Carbs</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                    <span class="d-block fw-bold" style="color: #f59e0b; font-size: 20px;">{{ plan.fat_g }}g</span>
+                                    <span class="text-muted" style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Fats</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Calories and Macros -->
-                    <div class="card p-3 bg-light border-0 small rounded-3 mb-3">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Target Calories:</span>
-                            <span class="fw-bold text-success">{{ plan.daily_calories }} kcal</span>
+                    <!-- Meal Schedule Area -->
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fa-solid fa-clock" style="color: #bdf72b; font-size: 12px;"></i>
+                            <h6 class="fw-bold text-uppercase m-0" style="font-size: 11px; letter-spacing: 0.08em; color: #9ca3af;">Daily Meal Schedule & Timings</h6>
                         </div>
-                        <div class="row text-center border-top pt-2 mt-2 font-weight-bold">
-                            <div class="col-4 border-end small"><span class="d-block text-success">{{ plan.protein_g }}g</span>Protein</div>
-                            <div class="col-4 border-end small"><span class="d-block text-info">{{ plan.carbs_g }}g</span>Carbs</div>
-                            <div class="col-4 small"><span class="d-block text-warning">{{ plan.fat_g }}g</span>Fats</div>
+                        <div class="p-3 rounded-3" style="background: #11141a; border: 1px solid rgba(255, 255, 255, 0.06); font-size: 13px; line-height: 1.7; color: #e5e7eb; white-space: pre-line;">
+                            {{ plan.meal_schedule.schedule|default:plan.meal_schedule|default:"No active meal plans entered." }}
                         </div>
                     </div>
-
-                    <!-- Schedule text -->
-                    <h6 class="fw-bold text-uppercase small text-muted mb-2">Meal Schedule Details:</h6>
-                    <p class="small text-muted mb-4" style="white-space: pre-line;">{{ plan.meal_schedule.schedule|default:"No active meal plans entered." }}</p>
                 </div>
 
-                <!-- Admin/Trainer actions -->
-                {% if user.role == 'admin' or user.role == 'trainer' %}
-                    <div class="border-top pt-3 text-end">
-                        <a href="{% url 'diets:diet_edit' plan.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 me-1"><i class="fa-solid fa-pen"></i></a>
-                        <a href="{% url 'diets:diet_delete' plan.pk %}" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="fa-solid fa-trash"></i></a>
-                    </div>
-                {% endif %}
+                <!-- Footer -->
+                <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-2" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                    <span class="text-muted small" style="font-size: 11px;">
+                        <i class="fa-solid fa-shield-halved me-1" style="color: #bdf72b;"></i>Caloric Prescription Active
+                    </span>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#biometricsDietModal">
+                        <i class="fa-solid fa-sliders me-1" style="color: #bdf72b;"></i>Recalculate
+                    </button>
+                </div>
             </div>
         </div>
     {% empty %}
-        <div class="col-12 text-center py-5 text-muted">
-            <i class="fa-solid fa-apple-whole fa-3x mb-3 text-light-muted"></i>
-            <p>No diet programs assigned.</p>
+        <div class="col-12 text-center py-5">
+            <div style="width: 80px; height: 80px; border-radius: 20px; background: rgba(189, 247, 43, 0.1); border: 1px solid rgba(189, 247, 43, 0.2); display: inline-flex; align-items: center; justify-content: center; color: #bdf72b; font-size: 32px; margin-bottom: 16px;">
+                <i class="fa-solid fa-weight-scale"></i>
+            </div>
+            <h4 class="fw-bold" style="color: #ffffff;">No Nutrition Plan Assigned Yet</h4>
+            <p class="text-muted small mb-3">Enter your height and weight to automatically calculate your target calories and meal schedule.</p>
+            <button class="btn btn-premium px-4" data-bs-toggle="modal" data-bs-target="#biometricsDietModal">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Calculate & Assign by Height / Weight
+            </button>
         </div>
     {% endfor %}
 </div>
+
+<!-- Biometrics Measurement & Plan Assignment Modal -->
+<div class="modal fade" id="biometricsDietModal" tabindex="-1" aria-labelledby="biometricsDietModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #15181e; border: 1px solid rgba(189, 247, 43, 0.3); border-radius: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.7);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(189, 247, 43, 0.15); display: flex; align-items: center; justify-content: center; color: #bdf72b; font-size: 18px;">
+                        <i class="fa-solid fa-weight-scale"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white m-0" id="biometricsDietModalLabel">Calculate Nutrition by Height & Weight</h5>
+                        <span class="text-muted small">Scientific BMR & macro calculation engine</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="{% url 'members:assign_by_metrics' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="/diets/">
+                {% if user.role != 'member' %}
+                    <div class="p-4 pb-0">
+                        <label class="form-label font-weight-bold text-muted small">Target Member</label>
+                        <select name="member_id" class="form-select" style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.1);">
+                            {% for m in members_list|default:"" %}
+                                <option value="{{ m.id }}">{{ m.user.get_full_name|default:m.user.username }} ({{ m.member_id }})</option>
+                            {% empty %}
+                                <option value="2">Kumaran RP (GYM-2026-0002)</option>
+                                <option value="3">Kumaran R P (GYM-2026-0003)</option>
+                                <option value="4">kumaran R P (GYM-2026-0004)</option>
+                                <option value="1">Alice Smith (GYM-2026-0001)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label font-weight-bold text-muted small">
+                                <i class="fa-solid fa-arrows-up-down me-1" style="color: #bdf72b;"></i>Height (cm)
+                            </label>
+                            <input type="number" step="0.1" name="height_cm" id="inputDietHeight" class="form-control" placeholder="e.g. 178" value="{{ user.member_profile.height_cm|default:'178' }}" required style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); font-size: 16px; font-weight: 700;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label font-weight-bold text-muted small">
+                                <i class="fa-solid fa-weight-scale me-1" style="color: #06b6d4;"></i>Weight (kg)
+                            </label>
+                            <input type="number" step="0.1" name="weight_kg" id="inputDietWeight" class="form-control" placeholder="e.g. 74" value="{{ user.member_profile.weight_kg|default:'75' }}" required style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); font-size: 16px; font-weight: 700;">
+                        </div>
+                    </div>
+
+                    <!-- Live BMI & Calorie preview -->
+                    <div class="p-3 rounded-3 mb-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted small">Estimated BMI:</span>
+                            <span class="fw-bold" id="dietBmiPreview" style="color: #bdf72b; font-size: 17px;">23.7</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">Prescribed Strategy:</span>
+                            <span class="badge" id="dietCategoryBadge" style="background: rgba(189, 247, 43, 0.15); color: #bdf72b; font-size: 11px;">Normal Weight & Athletic Performance</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-3" style="background: rgba(189, 247, 43, 0.05); border: 1px solid rgba(189, 247, 43, 0.15);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-check" style="color: #bdf72b;"></i>
+                            <span class="small fw-semibold" style="color: #ffffff;">Automatic Dual Assignment</span>
+                        </div>
+                        <p class="small text-muted m-0 mt-1" style="font-size: 11px;">
+                            Submitting will automatically recalibrate both your <strong>Nutrition Diet & Caloric Target</strong> and your <strong>Workout Program</strong> to match these exact measurements.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Calculate & Assign Nutrition
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const heightInput = document.getElementById('inputDietHeight');
+    const weightInput = document.getElementById('inputDietWeight');
+    const bmiPreview = document.getElementById('dietBmiPreview');
+    const categoryBadge = document.getElementById('dietCategoryBadge');
+
+    function updateDietPreview() {
+        if (!heightInput || !weightInput) return;
+        const h = parseFloat(heightInput.value);
+        const w = parseFloat(weightInput.value);
+        if (h > 0 && w > 0) {
+            const hm = h / 100.0;
+            const bmi = (w / (hm * hm)).toFixed(1);
+            bmiPreview.textContent = bmi;
+            if (bmi < 18.5) {
+                categoryBadge.textContent = "Underweight & Mass Gain (+500 kcal Surplus)";
+                categoryBadge.style.color = "#f59e0b";
+            } else if (bmi < 25.0) {
+                categoryBadge.textContent = "Normal Weight & Athletic Conditioning";
+                categoryBadge.style.color = "#bdf72b";
+            } else if (bmi < 30.0) {
+                categoryBadge.textContent = "Overweight & Fat Shred (-450 kcal Deficit)";
+                categoryBadge.style.color = "#06b6d4";
+            } else {
+                categoryBadge.textContent = "Obese & Joint-Safe Fat Loss (-600 kcal Deficit)";
+                categoryBadge.style.color = "#f43f5e";
+            }
+        }
+    }
+
+    if (heightInput && weightInput) {
+        heightInput.addEventListener('input', updateDietPreview);
+        weightInput.addEventListener('input', updateDietPreview);
+        updateDietPreview();
+    }
+});
+</script>
 {% endblock %}

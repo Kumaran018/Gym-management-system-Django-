@@ -1,74 +1,137 @@
 {% extends 'base.html' %}
 
-{% block title %}Payments Ledger - Muscle Fit Gym{% endblock %}
+{% block title %}Payments Ledger - Muscle n Fitness{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
-        <h2 class="fw-bold m-0"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i>Payments Ledger</h2>
-        <p class="text-muted m-0 small">Audit historical invoice logs and generate client receipts.</p>
-    </div>
-    {% if user.role == 'admin' or user.role == 'receptionist' %}
-        <div class="d-flex gap-2">
-            {% if user.role == 'admin' %}
-                <a href="{% url 'payments:monthly_revenue' %}" class="btn btn-outline-primary btn-sm px-3 rounded-pill"><i class="fa-solid fa-chart-line me-1"></i>Revenue Reports</a>
-            {% endif %}
-            <a href="{% url 'payments:record_payment' %}" class="btn btn-premium px-4"><i class="fa-solid fa-circle-plus me-2"></i>Record Payment</a>
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(189, 247, 43, 0.12); display: flex; align-items: center; justify-content: center; color: #bdf72b;">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <h2 class="fw-bold m-0" style="color: #ffffff; font-size: 22px;">Payments & Invoices</h2>
+            <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: #bdf72b; font-weight: 700; border-radius: 9999px; padding: 5px 12px; font-size: 11px;">
+                {{ payments|length }} Invoices
+            </span>
         </div>
-    {% endif %}
+        <p class="text-muted m-0 small">
+            {% if user.role == 'member' %}
+                Your personal billing records, membership dues, and receipt invoices.
+            {% else %}
+                Audit historical invoice logs, collect member payments, and generate client receipts.
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if user.role == 'member' %}
+            <button class="btn btn-premium px-4" data-bs-toggle="modal" data-bs-target="#memberPaymentModal">
+                <i class="fa-solid fa-credit-card me-2"></i>Make Payment / Pay Fee
+            </button>
+        {% else %}
+            {% if user.role == 'admin' %}
+                <a href="{% url 'payments:monthly_revenue' %}" class="btn btn-outline-secondary btn-sm px-3 rounded-pill">
+                    <i class="fa-solid fa-chart-line me-1" style="color: #bdf72b;"></i>Revenue Reports
+                </a>
+            {% endif %}
+            <a href="{% url 'payments:record_payment' %}" class="btn btn-premium px-4">
+                <i class="fa-solid fa-circle-plus me-2"></i>Record Payment
+            </a>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Search Panel -->
-<div class="card card-premium border-0 shadow-sm p-3 mb-4">
+<div class="card card-premium p-3 mb-4" style="background: #15181e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px;">
     <form method="GET" class="d-flex gap-2">
-        <input type="text" name="search" class="form-control bg-light border-0" placeholder="Search by Invoice ID, member name..." value="{{ search_query }}">
-        <button type="submit" class="btn btn-primary px-4">Search</button>
+        <div class="input-group" style="background: #11141a; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <span class="input-group-text bg-transparent border-0 text-muted">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </span>
+            <input type="text" name="search" class="form-control bg-transparent border-0 text-white" placeholder="Search by Invoice ID or member name..." value="{{ search_query }}" style="box-shadow: none;">
+        </div>
+        <button type="submit" class="btn btn-premium px-4">Search</button>
     </form>
 </div>
 
-<!-- Ledger logs -->
-<div class="card card-premium border-0 shadow-sm p-4">
+<!-- Ledger logs Table -->
+<div class="card card-premium p-4" style="background: #15181e; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
     <div class="table-responsive">
-        <table class="table align-middle text-nowrap">
-            <thead class="table-light-head">
-                <tr>
-                    <th>Invoice ID</th>
-                    <th>Member ID</th>
-                    <th>Member Name</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Date Recorded</th>
-                    <th class="text-end">Actions</th>
+        <table class="table align-middle text-nowrap mb-0">
+            <thead>
+                <tr style="background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Invoice ID</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Member</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Plan / Purpose</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Amount</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Method</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
+                    <th style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Date Recorded</th>
+                    <th class="text-end" style="padding: 12px 16px; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Receipt</th>
                 </tr>
             </thead>
             <tbody>
                 {% for payment in payments %}
-                <tr>
-                    <td class="fw-bold text-primary">{{ payment.invoice_number }}</td>
-                    <td class="small">{{ payment.member.member_id }}</td>
-                    <td class="fw-semibold text-dark">{{ payment.member.user.get_full_name }}</td>
-                    <td class="fw-bold text-success">₹{{ payment.amount }}</td>
-                    <td class="text-capitalize">{{ payment.payment_method }}</td>
-                    <td>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                    <td style="padding: 12px 16px;">
+                        <span class="fw-bold" style="color: #bdf72b; font-family: monospace; font-size: 13px;">{{ payment.invoice_number }}</span>
+                    </td>
+                    <td style="padding: 12px 16px;">
+                        <span class="fw-semibold d-block" style="color: #ffffff; font-size: 13.5px;">{{ payment.member.user.get_full_name|default:payment.member.user.username }}</span>
+                        <span class="text-muted small" style="font-size: 11px;">ID: {{ payment.member.member_id }}</span>
+                    </td>
+                    <td style="padding: 12px 16px;">
+                        <span class="badge" style="background: rgba(255, 255, 255, 0.05); color: #d1d5db; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 11.5px; border-radius: 8px;">
+                            {{ payment.membership.plan.name|default:"Gym Fee & Services" }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 16px;">
+                        <span class="fw-bold" style="color: #bdf72b; font-size: 15px;">₹{{ payment.amount }}</span>
+                    </td>
+                    <td style="padding: 12px 16px;">
+                        <span class="text-capitalize" style="color: #9ca3af; font-size: 12.5px;">
+                            {% if payment.payment_method == 'upi' %}
+                                <i class="fa-solid fa-mobile-screen-button me-1" style="color: #06b6d4;"></i>UPI
+                            {% elif payment.payment_method == 'card' %}
+                                <i class="fa-solid fa-credit-card me-1" style="color: #a855f7;"></i>Card
+                            {% elif payment.payment_method == 'online' %}
+                                <i class="fa-solid fa-globe me-1" style="color: #10b981;"></i>Online
+                            {% else %}
+                                <i class="fa-solid fa-money-bill-wave me-1" style="color: #f59e0b;"></i>Cash
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 16px;">
                         {% if payment.payment_status == 'paid' %}
-                            <span class="badge bg-success-subtle text-success">Paid</span>
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 9999px; padding: 4px 10px; font-size: 11px;">
+                                <i class="fa-solid fa-check me-1"></i>Paid
+                            </span>
                         {% elif payment.payment_status == 'pending' %}
-                            <span class="badge bg-warning-subtle text-warning">Pending</span>
+                            <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 9999px; padding: 4px 10px; font-size: 11px;">
+                                <i class="fa-solid fa-clock me-1"></i>Pending
+                            </span>
                         {% else %}
-                            <span class="badge bg-danger-subtle text-danger">Failed</span>
+                            <span class="badge" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 9999px; padding: 4px 10px; font-size: 11px;">
+                                <i class="fa-solid fa-xmark me-1"></i>Failed
+                            </span>
                         {% endif %}
                     </td>
-                    <td>{{ payment.payment_date|date:"M d, Y, h:i A" }}</td>
-                    <td class="text-end">
-                        <a href="{% url 'payments:generate_receipt' payment.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fa-solid fa-receipt me-1"></i>Receipt</a>
+                    <td style="padding: 12px 16px; color: #9ca3af; font-size: 12.5px;">
+                        {{ payment.payment_date|date:"M d, Y, h:i A" }}
+                    </td>
+                    <td class="text-end" style="padding: 12px 16px;">
+                        <a href="{% url 'payments:generate_receipt' payment.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" style="font-size: 12px;">
+                            <i class="fa-solid fa-receipt me-1" style="color: #bdf72b;"></i>Receipt
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="8" class="text-center text-muted py-5">
-                        <i class="fa-solid fa-receipt fa-3x mb-3 text-light-muted"></i>
-                        <p class="m-0">No invoice records logged in this ledger.</p>
+                    <td colspan="8" class="text-center py-5 text-muted">
+                        <div style="width: 70px; height: 70px; border-radius: 18px; background: rgba(189, 247, 43, 0.08); display: inline-flex; align-items: center; justify-content: center; color: #bdf72b; font-size: 28px; margin-bottom: 14px;">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <h5 class="fw-bold" style="color: #ffffff;">No Payment Invoices Found</h5>
+                        <p class="m-0 small text-muted">No billing transactions logged for this account.</p>
                     </td>
                 </tr>
                 {% endfor %}
@@ -76,4 +139,61 @@
         </table>
     </div>
 </div>
+
+<!-- Member Quick Payment Modal -->
+{% if user.role == 'member' %}
+<div class="modal fade" id="memberPaymentModal" tabindex="-1" aria-labelledby="memberPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #15181e; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(189, 247, 43, 0.15); display: flex; align-items: center; justify-content: center; color: #bdf72b;">
+                        <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white m-0" id="memberPaymentModalLabel">Make Gym Fee Payment</h5>
+                        <span class="text-muted small">Instant payment recording for Muscle n Fitness</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'payments:record_payment' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Paying Member</label>
+                        <input type="text" class="form-control" value="{{ user.get_full_name|default:user.username }} ({{ user.member_profile.member_id }})" readonly style="background: #11141a; color: #9ca3af; border: 1px solid rgba(255,255,255,0.08);">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Payment Amount (₹)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="e.g. 2500.00" value="2000.00" required style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.08); font-size: 16px; font-weight: 700;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-muted small">Payment Method</label>
+                        <select name="payment_method" class="form-select" style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.08);">
+                            <option value="upi" selected>UPI (Google Pay, PhonePe, Paytm)</option>
+                            <option value="card">Credit / Debit Card</option>
+                            <option value="online">Net Banking / Online</option>
+                            <option value="cash">Front Desk Cash</option>
+                        </select>
+                    </div>
+                    <div class="p-3 rounded-3" style="background: rgba(189, 247, 43, 0.06); border: 1px solid rgba(189, 247, 43, 0.2);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-shield-halved" style="color: #bdf72b;"></i>
+                            <span class="small" style="color: #e5e7eb; font-weight: 600;">Secure Instant Receipt Generation</span>
+                        </div>
+                        <p class="small text-muted m-0 mt-1" style="font-size: 11px;">An official invoice receipt will be instantly generated upon submission.</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-lock me-2"></i>Confirm & Pay
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

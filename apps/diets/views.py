@@ -9,15 +9,14 @@ from .forms import DietPlanForm
 def diet_list(request):
     user = request.user
     
-    # Filter views based on roles
     if user.role == 'member':
-        # Members only see their own diets
-        diet_plans = DietPlan.objects.filter(member__user=user).select_related('trainer__user').order_by('-start_date')
+        # Strictly show only this particular member's diet plans
+        diet_plans = DietPlan.objects.filter(member__user=user).select_related('trainer__user', 'member__user').order_by('-start_date')
     elif user.role == 'trainer':
         # Trainers see diets they created/assigned
         diet_plans = DietPlan.objects.filter(trainer__user=user).select_related('member__user').order_by('-start_date')
     else:
-        # Admins/Receptionists see all
+        # Admins/Staff see all
         diet_plans = DietPlan.objects.all().select_related('member__user', 'trainer__user').order_by('-start_date')
         
     return render(request, 'diets/list.html', {'diet_plans': diet_plans})

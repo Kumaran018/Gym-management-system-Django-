@@ -19,6 +19,8 @@ class Member(models.Model):
     member_id = models.CharField(max_length=20, unique=True, blank=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     date_of_birth = models.DateField()
+    height_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Height in cm (e.g. 175.5)")
+    weight_kg = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Weight in kg (e.g. 74.0)")
     address = models.TextField(blank=True, null=True)
     emergency_contact_name = models.CharField(max_length=100)
     emergency_contact_phone = models.CharField(max_length=15)
@@ -26,6 +28,41 @@ class Member(models.Model):
     join_date = models.DateField(default=timezone.now)
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='active')
     assigned_trainer = models.ForeignKey('trainers.Trainer', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_members')
+
+    @property
+    def bmi(self):
+        if self.height_cm and self.weight_kg and self.height_cm > 0:
+            h_m = float(self.height_cm) / 100.0
+            return round(float(self.weight_kg) / (h_m * h_m), 1)
+        return None
+
+    @property
+    def bmi_category(self):
+        val = self.bmi
+        if val is None:
+            return "Not Measured"
+        if val < 18.5:
+            return "Underweight"
+        elif val < 25.0:
+            return "Normal Weight"
+        elif val < 30.0:
+            return "Overweight"
+        else:
+            return "Obese"
+
+    @property
+    def recommended_focus(self):
+        val = self.bmi
+        if val is None:
+            return "Complete Body Assessment Needed"
+        if val < 18.5:
+            return "Mass Gain & Hypertrophy Surplus"
+        elif val < 25.0:
+            return "Athletic Conditioning & Lean Hypertrophy"
+        elif val < 30.0:
+            return "Body Recomposition & Fat Shred"
+        else:
+            return "Joint-Friendly Fat Loss & Cardio Stamina"
 
     def save(self, *args, **kwargs):
         if not self.member_id:

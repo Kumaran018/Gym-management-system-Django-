@@ -1,23 +1,606 @@
-{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muscle n Fitness - Gym Management Ecosystem</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3.0">
+    
+    <style>
+        body {
+            background-color: #0b0d10 !important;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
 
-{% block title %}Welcome - Gym Management System{% endblock %}
+        /* Ambient Glows */
+        .hero-glow {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(189, 247, 43, 0.09) 0%, rgba(16, 185, 129, 0.03) 45%, transparent 70%);
+            top: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            filter: blur(50px);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-{% block content %}
-<div class="row align-items-center justify-content-center min-vh-75">
-    <div class="col-md-8 text-center py-5">
-        <div class="mb-4">
-            <i class="fa-solid fa-dumbbell fa-5x text-primary" style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+        /* Top Sticky Landing Nav */
+        .landing-nav {
+            background: rgba(15, 18, 23, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 0.85rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1040;
+            white-space: nowrap !important;
+        }
+
+        .landing-nav-link {
+            color: #9ca3af;
+            font-weight: 500;
+            font-size: 13.5px;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap !important;
+            display: inline-block;
+        }
+        .landing-nav-link:hover {
+            color: #bdf72b;
+            background: rgba(189, 247, 43, 0.08);
+        }
+
+        .landing-nav .btn-dark-pill,
+        .landing-nav .btn-lime,
+        .landing-nav a,
+        .landing-nav span {
+            white-space: nowrap !important;
+        }
+
+        /* Feature Card Grid */
+        .feature-card {
+            background: #15181e;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 1.75rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(189, 247, 43, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(189, 247, 43, 0.08);
+        }
+
+        .feature-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(189, 247, 43, 0.12);
+            border: 1px solid rgba(189, 247, 43, 0.25);
+            color: #bdf72b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Stat Counter Ribbon */
+        .stat-ribbon-card {
+            background: #15181e;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+        .stat-ribbon-num {
+            font-size: 28px;
+            font-weight: 800;
+            color: #bdf72b;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .stat-ribbon-label {
+            font-size: 12px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Role Gateway Card */
+        .role-portal-card {
+            background: linear-gradient(180deg, #161a22 0%, #101318 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.25s;
+            text-decoration: none;
+            display: block;
+        }
+        .role-portal-card:hover {
+            border-color: #bdf72b;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-glow"></div>
+
+    <!-- Navigation Bar -->
+    <header class="landing-nav">
+        <div class="container-fluid px-3 px-xl-5 d-flex align-items-center justify-content-between flex-nowrap" style="white-space: nowrap;">
+            <!-- Brand: Muscle n Fitness -->
+            <a href="{% url 'core:home' %}" class="d-flex align-items-center gap-2 text-decoration-none flex-shrink-0" style="white-space: nowrap;">
+                <div class="brand-icon-geom">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <div class="brand-name-text fs-5" style="white-space: nowrap;">
+                    Muscle n <span style="color: #bdf72b;">Fitness</span>
+                </div>
+            </a>
+
+            <!-- Center Navigation Links (Single Line Guaranteed) -->
+            <nav class="d-none d-lg-flex align-items-center gap-2 flex-shrink-0" style="white-space: nowrap;">
+                <a href="#features" class="landing-nav-link" style="white-space: nowrap;">Features Hub</a>
+                <a href="#plans" class="landing-nav-link" style="white-space: nowrap;">Membership Plans</a>
+                <a href="#portals" class="landing-nav-link" style="white-space: nowrap;">Staff/Member Portals</a>
+                <a href="{% url 'core:general_dashboard' %}" class="landing-nav-link" style="white-space: nowrap;">Equipment Catalog</a>
+            </nav>
+
+            <!-- Right CTA Action Buttons (Single Line Guaranteed) -->
+            <div class="d-flex align-items-center gap-2 flex-shrink-0" style="white-space: nowrap;">
+                <a href="{% url 'authentication:login' %}" class="btn-dark-pill px-3 py-2 fw-bold" style="border-color: rgba(189, 247, 43, 0.4) !important; color: #bdf72b !important; white-space: nowrap;">
+                    <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In / Login Page
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:admin_home' %}" class="btn-lime px-3 py-2" style="white-space: nowrap;">
+                        <i class="fa-solid fa-table-cells-large"></i> Go to Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'authentication:register' %}" class="btn-lime px-3 py-2" style="white-space: nowrap;">
+                        Join Gym <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                {% endif %}
+            </div>
         </div>
-        <h1 class="display-3 fw-bold mb-3">Muscle Fit Gym</h1>
-        <p class="lead text-muted mb-4 fs-4">A complete, production-grade Gym Management System. Efficiently manage members, trainers, attendance, payments, scheduling, workouts, and diets.</p>
-        
-        <div class="d-flex justify-content-center gap-3">
-            {% if user.is_authenticated %}
-                <a href="#" class="btn btn-premium px-5 py-3 fs-5"><i class="fa-solid fa-dashboard me-2"></i>Go to Dashboard</a>
-            {% else %}
-                <a href="#" class="btn btn-premium px-5 py-3 fs-5"><i class="fa-solid fa-sign-in me-2"></i>Access System Login</a>
-            {% endif %}
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="py-5 position-relative">
+        <div class="container px-4 text-center py-lg-5">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1.5 rounded-pill mb-4" style="background: rgba(189, 247, 43, 0.1); border: 1px solid rgba(189, 247, 43, 0.25); color: #bdf72b; font-size: 12.5px; font-weight: 700;">
+                <i class="fa-solid fa-bolt"></i> OFFICIAL SYSTEM OF MUSCLE N FITNESS
+            </div>
+
+            <h1 class="display-3 fw-extrabold mb-3 text-white" style="letter-spacing: -0.03em; line-height: 1.1;">
+                MUSCLE N FITNESS<br>
+                <span style="color: #bdf72b; text-shadow: 0 0 35px rgba(189, 247, 43, 0.4);">CENTRAL GYM COMMAND</span>
+            </h1>
+
+            <p class="lead text-secondary mx-auto mb-4" style="max-width: 680px; font-size: 18px; line-height: 1.6;">
+                Welcome to <strong>Muscle n Fitness</strong>. Manage members, personal trainers, workouts, diet templates, attendance, and revenue through this single high-performance platform.
+            </p>
+
+            <!-- Direct Action Buttons with clear Login Link -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                <a href="{% url 'authentication:login' %}" class="btn-lime px-4 py-3 fs-6">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i> Go to Login Page
+                </a>
+                <a href="{% url 'dashboard:admin_home' %}" class="btn-dark-pill px-4 py-3 fs-6">
+                    <i class="fa-solid fa-table-cells-large me-2"></i> Open Overview Dashboard
+                </a>
+                <a href="#features" class="btn-dark-pill px-4 py-3 fs-6">
+                    <i class="fa-solid fa-compass me-2"></i> Explore All Features
+                </a>
+            </div>
+
+            <!-- Live Metrics Summary Ribbon -->
+            <div class="row row-cols-2 row-cols-md-4 g-3 max-w-4xl mx-auto" style="max-width: 900px;">
+                <div class="col">
+                    <div class="stat-ribbon-card">
+                        <div class="stat-ribbon-num">{{ total_members|default:"1,511" }}</div>
+                        <div class="stat-ribbon-label">Total Members</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-ribbon-card">
+                        <div class="stat-ribbon-num">{{ active_members|default:"1,240" }}</div>
+                        <div class="stat-ribbon-label">Active Passes</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-ribbon-card">
+                        <div class="stat-ribbon-num">{{ total_trainers|default:"18" }}</div>
+                        <div class="stat-ribbon-label">Expert Trainers</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-ribbon-card">
+                        <div class="stat-ribbon-num">{{ total_equipments|default:"45" }}+</div>
+                        <div class="stat-ribbon-label">Equipments</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </section>
+
+    <!-- =========================================================================
+         ALL ACCESSIBLE FEATURES SECTION (User requirement: features should be accessible)
+         ========================================================================= -->
+    <section id="features" class="py-5" style="border-top: 1px solid rgba(255, 255, 255, 0.06); background: rgba(15, 18, 23, 0.5);">
+        <div class="container px-4 py-4">
+            <div class="text-center mb-5">
+                <span class="text-uppercase fw-bold" style="color: #bdf72b; font-size: 12px; letter-spacing: 0.1em;">Feature Matrix</span>
+                <h2 class="display-6 fw-bold text-white mt-1">Directly Accessible System Modules</h2>
+                <p class="text-secondary small">Access any operational module directly from this single home hub</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <!-- 1. Executive Dashboard -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-table-cells-large"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Executive Dashboard</h4>
+                            <p class="text-secondary small mb-4">
+                                Exact dark SaaS analytics matching the reference design: revenue breakdown, gauge meter, sales donut, wave graph.
+                            </p>
+                        </div>
+                        <a href="{% url 'dashboard:admin_home' %}" class="btn-lime w-100 justify-content-center">
+                            Launch Dashboard <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. Members Management -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Member Profiles</h4>
+                            <p class="text-secondary small mb-4">
+                                Complete subscriber directory, membership renewals, emergency contacts, profile avatars, and payment tracking.
+                            </p>
+                        </div>
+                        <a href="{% url 'members:list' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            View Member Roster
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3. Certified Trainers -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-dumbbell"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Personal Trainers</h4>
+                            <p class="text-secondary small mb-4">
+                                Certified fitness coach profiles, specialties, member allocation matrices, and coaching timetables.
+                            </p>
+                        </div>
+                        <a href="{% url 'trainers:list' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Explore Trainers
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4. Membership Plans -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-address-card"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Subscription Plans</h4>
+                            <p class="text-secondary small mb-4">
+                                Flexible packages, monthly subscriptions, annual passes, and VIP tier benefits with custom pricing.
+                            </p>
+                        </div>
+                        <a href="{% url 'membership:plan_list' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Browse All Plans
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5. Daily Attendance Check-ins -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Attendance Check-In</h4>
+                            <p class="text-secondary small mb-4">
+                                Fast daily check-in scanner, logs, member arrival timestamps, and live gym occupancy metrics.
+                            </p>
+                        </div>
+                        <a href="{% url 'attendance:daily_attendance' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Log Attendance
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 6. Payments & Invoicing -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-credit-card"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Financial Collections</h4>
+                            <p class="text-secondary small mb-4">
+                                Process plan fees, generate receipts, inspect payment histories, and manage pending dues.
+                            </p>
+                        </div>
+                        <a href="{% url 'payments:payment_history' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Payment History
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 7. Workout Program Builder -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-person-running"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Workout Programs</h4>
+                            <p class="text-secondary small mb-4">
+                                Strength routines, cardio splits, targeted muscle groups, rep ranges, and personalized coaching routines.
+                            </p>
+                        </div>
+                        <a href="{% url 'workouts:workout_list' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Workout Routines
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 8. Diet & Nutrition Planner -->
+                <div class="col">
+                    <div class="feature-card">
+                        <div>
+                            <div class="feature-icon-box">
+                                <i class="fa-solid fa-apple-whole"></i>
+                            </div>
+                            <h4 class="text-white fs-5 fw-bold mb-2">Diet & Nutrition</h4>
+                            <p class="text-secondary small mb-4">
+                                Macro splits, customized caloric targets, clean meal templates, and nutrition tracking for athletes.
+                            </p>
+                        </div>
+                        <a href="{% url 'diets:diet_list' %}" class="btn-dark-pill w-100 text-center text-decoration-none">
+                            Diet Programs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         MEMBERSHIP PLANS PRICING SHOWCASE (Rs. 2,500 Premium Plan)
+         ========================================================================= -->
+    <section id="plans" class="py-5 position-relative">
+        <div class="container px-4 py-4">
+            <div class="text-center mb-5">
+                <span class="text-uppercase fw-bold" style="color: #bdf72b; font-size: 12px; letter-spacing: 0.1em;">Pricing & Memberships</span>
+                <h2 class="display-6 fw-bold text-white mt-1">Muscle n Fitness Plans</h2>
+                <p class="text-secondary small">Flexible membership plans built for individual athletes and fitness teams</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-lg-3 g-4 align-items-stretch">
+                <!-- Plan 1: Starter Plan -->
+                <div class="col">
+                    <div class="card-dark h-100 d-flex flex-column justify-content-between p-4">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase mb-2">Basic Access</div>
+                            <h3 class="text-white fw-bold mb-3">Starter Pass</h3>
+                            <div class="d-flex align-items-baseline gap-2 mb-4">
+                                <span class="display-5 fw-extrabold text-white">Rs. 1,000</span>
+                                <span class="text-muted">/ Month</span>
+                            </div>
+                            <ul class="list-unstyled d-flex flex-column gap-2 text-secondary small mb-4">
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Standard cardio & weights floor</li>
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Locker room & shower access</li>
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Mobile check-in</li>
+                            </ul>
+                        </div>
+                        <a href="{% url 'authentication:login' %}" class="btn-dark-pill text-center text-decoration-none">Choose Starter (Rs. 1,000)</a>
+                    </div>
+                </div>
+
+                <!-- Plan 2: PREMIUM PLAN (Rs. 2,500 Most Popular) -->
+                <div class="col">
+                    <div class="promo-plan-card h-100 p-4 position-relative" style="border: 2px solid #bdf72b; transform: scale(1.02);">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge" style="background: #bdf72b; color: #090b0e; font-weight: 800; font-size: 10px; border-radius: 9999px; padding: 6px 12px;">MOST POPULAR</span>
+                        </div>
+                        <div>
+                            <div class="promo-badge mb-2">
+                                <i class="fa-solid fa-bolt"></i>
+                                <span>Premium Plan</span>
+                            </div>
+                            <h3 class="text-white fw-bold mb-1">Pro Athlete</h3>
+                            <div class="promo-price my-3">
+                                <span>Rs. 2,500</span>
+                                <div class="promo-price-period">
+                                    <div>Per Quarter</div>
+                                    <div>(3 Months)</div>
+                                </div>
+                            </div>
+                            <p class="promo-desc">
+                                Improve your fitness journey, track custom workouts, analyze nutrition, and gain unlimited gym floor access.
+                            </p>
+                            <ul class="list-unstyled d-flex flex-column gap-2 text-white small mb-4">
+                                <li><i class="fa-solid fa-circle-check text-lime me-2" style="color: #bdf72b;"></i>Full 24/7 Unlimited Gym Access</li>
+                                <li><i class="fa-solid fa-circle-check text-lime me-2" style="color: #bdf72b;"></i>Personal Trainer Consultations</li>
+                                <li><i class="fa-solid fa-circle-check text-lime me-2" style="color: #bdf72b;"></i>Custom Workout & Diet Programs</li>
+                                <li><i class="fa-solid fa-circle-check text-lime me-2" style="color: #bdf72b;"></i>Sauna & Recovery Spa Access</li>
+                            </ul>
+                        </div>
+                        <a href="{% url 'authentication:login' %}" class="promo-btn-lime text-decoration-none text-center justify-content-center">
+                            Get Started Now (Rs. 2,500) <i class="fa-solid fa-star ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Plan 3: VIP Elite Plan -->
+                <div class="col">
+                    <div class="card-dark h-100 d-flex flex-column justify-content-between p-4">
+                        <div>
+                            <div class="text-muted small fw-bold text-uppercase mb-2">VIP Experience</div>
+                            <h3 class="text-white fw-bold mb-3">Elite Executive</h3>
+                            <div class="d-flex align-items-baseline gap-2 mb-4">
+                                <span class="display-5 fw-extrabold text-white">Rs. 10,000</span>
+                                <span class="text-muted">/ Year</span>
+                            </div>
+                            <ul class="list-unstyled d-flex flex-column gap-2 text-secondary small mb-4">
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Dedicated Personal Trainer 3x/week</li>
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Full InBody Biomarker Scans</li>
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>Custom nutrition meal prep plans</li>
+                                <li><i class="fa-solid fa-check text-lime me-2" style="color: #bdf72b;"></i>VIP lounge and priority booking</li>
+                            </ul>
+                        </div>
+                        <a href="{% url 'authentication:login' %}" class="btn-dark-pill text-center text-decoration-none">Choose VIP Elite (Rs. 10,000)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         ROLE PORTALS GATEWAY
+         ========================================================================= -->
+    <section id="portals" class="py-5" style="border-top: 1px solid rgba(255, 255, 255, 0.06); background: rgba(15, 18, 23, 0.5);">
+        <div class="container px-4 py-4">
+            <div class="text-center mb-5">
+                <span class="text-uppercase fw-bold" style="color: #bdf72b; font-size: 12px; letter-spacing: 0.1em;">Role Access</span>
+                <h2 class="display-6 fw-bold text-white mt-1">Multi-Role Specialized Portals</h2>
+                <p class="text-secondary small">Switch between role dashboards or sign in to your dedicated interface</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+                <!-- Portal 1: Super Admin -->
+                <div class="col">
+                    <a href="{% url 'dashboard:admin_home' %}" class="role-portal-card text-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(189, 247, 43, 0.15); color: #bdf72b; font-size: 16px;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-muted"></i>
+                        </div>
+                        <h5 class="fw-bold m-0 mb-1">Super Admin</h5>
+                        <p class="text-secondary small m-0">Full control, revenue, staff, member roster, system settings.</p>
+                    </a>
+                </div>
+
+                <!-- Portal 2: Receptionist -->
+                <div class="col">
+                    <a href="{% url 'dashboard:reception_home' %}" class="role-portal-card text-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 16px;">
+                                <i class="fa-solid fa-desktop"></i>
+                            </span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-muted"></i>
+                        </div>
+                        <h5 class="fw-bold m-0 mb-1">Reception Desk</h5>
+                        <p class="text-secondary small m-0">Check-in desk, register visitors, renew passes, collect payments.</p>
+                    </a>
+                </div>
+
+                <!-- Portal 3: Trainer -->
+                <div class="col">
+                    <a href="{% url 'dashboard:trainer_home' %}" class="role-portal-card text-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-size: 16px;">
+                                <i class="fa-solid fa-dumbbell"></i>
+                            </span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-muted"></i>
+                        </div>
+                        <h5 class="fw-bold m-0 mb-1">Trainer Hub</h5>
+                        <p class="text-secondary small m-0">Assigned trainees, workout builders, diet plans, athlete progress.</p>
+                    </a>
+                </div>
+
+                <!-- Portal 4: Member -->
+                <div class="col">
+                    <a href="{% url 'dashboard:member_home' %}" class="role-portal-card text-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="d-inline-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(168, 85, 247, 0.15); color: #a855f7; font-size: 16px;">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-muted"></i>
+                        </div>
+                        <h5 class="fw-bold m-0 mb-1">Member Zone</h5>
+                        <p class="text-secondary small m-0">My current pass, attendance log, today's workout, diet nutrition.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-5" style="border-top: 1px solid rgba(255, 255, 255, 0.08); background: #090b0e;">
+        <div class="container px-4">
+            <div class="row g-4 align-items-center justify-content-between">
+                <div class="col-md-6 text-center text-md-start">
+                    <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-start mb-2">
+                        <div class="brand-icon-geom">
+                            <i class="fa-solid fa-dumbbell"></i>
+                        </div>
+                        <div class="brand-name-text fs-6">
+                            Muscle n <span>Fitness</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small m-0">
+                        &copy; 2026 Muscle n Fitness Gym Management System. High-performance software for athletes and fitness clubs.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3 text-secondary small">
+                        <a href="{% url 'authentication:login' %}" class="text-secondary text-decoration-none hover-lime fw-bold" style="color: #bdf72b !important;">Login Page</a>
+                        <span>•</span>
+                        <a href="{% url 'dashboard:admin_home' %}" class="text-secondary text-decoration-none hover-lime">Overview</a>
+                        <span>•</span>
+                        <a href="{% url 'membership:plan_list' %}" class="text-secondary text-decoration-none hover-lime">Plans</a>
+                        <span>•</span>
+                        <a href="{% url 'core:general_dashboard' %}" class="text-secondary text-decoration-none hover-lime">Catalog</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

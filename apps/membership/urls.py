@@ -4,6 +4,7 @@ from . import views
 app_name = 'membership'
 
 urlpatterns = [
+    path('', views.plan_list, name='plan_list_root'),
     path('plans/', views.plan_list, name='plan_list'),
     path('plans/add/', views.plan_add, name='plan_add'),
     path('plans/edit/<int:pk>/', views.plan_edit, name='plan_edit'),

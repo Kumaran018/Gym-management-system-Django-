@@ -9,14 +9,29 @@ from .forms import PaymentForm
 import datetime
 
 @login_required
-@role_required(['admin', 'receptionist'])
 def record_payment(request):
+    user = request.user
     if request.method == 'POST':
-        form = PaymentForm(request.POST)
-        if form.is_valid():
-            payment = form.save()
-            messages.success(request, f"Payment recorded successfully! Invoice generated: {payment.invoice_number}")
+        if user.role == 'member':
+            member = user.member_profile
+            amount = request.POST.get('amount')
+            method = request.POST.get('payment_method', 'upi')
+            active_mem = member.memberships.filter(status='active').first()
+            payment = Payment.objects.create(
+                member=member,
+                membership=active_mem,
+                amount=amount,
+                payment_method=method,
+                payment_status='paid'
+            )
+            messages.success(request, f"Payment of ₹{payment.amount} completed successfully! Invoice: {payment.invoice_number}")
             return redirect('payments:payment_history')
+        else:
+            form = PaymentForm(request.POST)
+            if form.is_valid():
+                payment = form.save()
+                messages.success(request, f"Payment recorded successfully! Invoice generated: {payment.invoice_number}")
+                return redirect('payments:payment_history')
     else:
         # Pre-populate member if passed in GET params
         member_id = request.GET.get('member_id')
@@ -25,7 +40,6 @@ def record_payment(request):
             member = Member.objects.filter(pk=member_id).first()
             if member:
                 initial_data['member'] = member
-                # Try to get active membership
                 active_mem = member.memberships.filter(status='active').first()
                 if active_mem:
                     initial_data['membership'] = active_mem
@@ -38,7 +52,10 @@ def record_payment(request):
 def payment_history(request):
     user = request.user
     if user.role == 'member':
-        payments = Payment.objects.filter(member__user=user).order_by('-payment_date')
+        # Strictly show only this particular member's payment transactions
+        payments = Payment.objects.filter(member__user=user).select_related('member__user').order_by('-payment_date')
+    elif user.role == 'trainer':
+        payments = Payment.objects.filter(member__assigned_trainer__user=user).select_related('member__user').order_by('-payment_date')
     else:
         payments = Payment.objects.all().select_related('member__user').order_by('-payment_date')
     

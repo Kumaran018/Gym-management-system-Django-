@@ -41,8 +41,13 @@ def daily_attendance(request):
                 
         return redirect('attendance:daily_attendance')
 
-    # Fetch all members
-    members = Member.objects.all().select_related('user')
+    # Fetch members based on role (strictly personal for members)
+    if request.user.role == 'member':
+        members = Member.objects.filter(user=request.user).select_related('user')
+    elif request.user.role == 'trainer':
+        members = Member.objects.filter(assigned_trainer__user=request.user).select_related('user')
+    else:
+        members = Member.objects.all().select_related('user')
     
     # Search query
     search_query = request.GET.get('search', '').strip()

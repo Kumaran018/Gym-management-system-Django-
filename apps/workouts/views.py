@@ -10,15 +10,14 @@ from .forms import WorkoutPlanForm, ExerciseFormSet
 def workout_list(request):
     user = request.user
     
-    # Filter views based on roles
     if user.role == 'member':
-        # Members only see their own workouts
-        workout_plans = WorkoutPlan.objects.filter(member__user=user).select_related('trainer__user').order_by('-start_date')
+        # Strictly show only this particular member's workouts
+        workout_plans = WorkoutPlan.objects.filter(member__user=user).select_related('trainer__user', 'member__user').order_by('-start_date')
     elif user.role == 'trainer':
         # Trainers see workouts they created/assigned
         workout_plans = WorkoutPlan.objects.filter(trainer__user=user).select_related('member__user').order_by('-start_date')
     else:
-        # Admins/Receptionists see all
+        # Admins/Staff see all
         workout_plans = WorkoutPlan.objects.all().select_related('member__user', 'trainer__user').order_by('-start_date')
         
     return render(request, 'workouts/list.html', {'workout_plans': workout_plans})

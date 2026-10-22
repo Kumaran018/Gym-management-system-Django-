@@ -10,10 +10,14 @@ from .models import Member
 from .forms import UserForm, MemberForm
 
 @login_required
-@role_required(['admin', 'receptionist', 'trainer'])
 def member_list(request):
-    # Query all members with user records loaded
-    queryset = Member.objects.select_related('user').all().order_by('-join_date')
+    user = request.user
+    if user.role == 'member':
+        queryset = Member.objects.filter(user=user).select_related('user').order_by('-join_date')
+    elif user.role == 'trainer':
+        queryset = Member.objects.filter(assigned_trainer__user=user).select_related('user').order_by('-join_date')
+    else:
+        queryset = Member.objects.select_related('user').all().order_by('-join_date')
 
     # Apply Search Filter (Search by Name, Email, Member ID, Phone)
     search_query = request.GET.get('search', '').strip()
@@ -70,6 +74,12 @@ def member_add(request):
                     member = member_form.save(commit=False)
                     member.user = user
                     member.save()
+
+                    if member.height_cm and member.weight_kg:
+                        try:
+                            assign_plans_by_biometrics(member, member.height_cm, member.weight_kg, member.assigned_trainer)
+                        except Exception:
+                            pass
                     
                     messages.success(request, f"Member {user.get_full_name()} was successfully registered with ID {member.member_id}!")
                     return redirect('members:list')
@@ -99,7 +109,14 @@ def member_edit(request, pk):
             try:
                 with transaction.atomic():
                     user_form.save()
-                    member_form.save()
+                    member = member_form.save()
+
+                    if member.height_cm and member.weight_kg:
+                        try:
+                            assign_plans_by_biometrics(member, member.height_cm, member.weight_kg, member.assigned_trainer)
+                        except Exception:
+                            pass
+
                     messages.success(request, f"Member profile for {user.get_full_name()} was successfully updated!")
                     return redirect('members:profile', pk=member.pk)
             except Exception as e:
@@ -157,3 +174,49 @@ def member_profile(request, pk):
         'diet_plan': diet_plan,
     }
     return render(request, 'members/profile.html', context)
+
+from .services import assign_plans_by_biometrics
+
+@login_required
+def calculate_and_assign_plan_view(request):
+    if request.method == 'POST':
+        # If member role, assign for themselves; if staff, can assign for selected member
+        if request.user.role == 'member':
+            member = request.user.member_profile
+        else:
+            member_id = request.POST.get('member_id')
+            if member_id:
+                member = get_object_or_404(Member, pk=member_id)
+            elif hasattr(request.user, 'member_profile'):
+                member = request.user.member_profile
+            else:
+                member = Member.objects.first()
+
+        height_cm = request.POST.get('height_cm')
+        weight_kg = request.POST.get('weight_kg')
+        redirect_to = request.POST.get('next') or request.META.get('HTTP_REFERER') or '/workouts/'
+
+        if not height_cm or not weight_kg:
+            messages.error(request, "Please enter both height (cm) and weight (kg) to calculate your personalized plan.")
+            return redirect(redirect_to)
+
+        try:
+            wp, dp, metrics = assign_plans_by_biometrics(
+                member=member,
+                height_cm=height_cm,
+                weight_kg=weight_kg,
+                trainer=member.assigned_trainer
+            )
+            messages.success(
+                request,
+                f"Personalized Plan Assigned for {member.user.get_full_name() or member.user.username}! "
+                f"BMI: {metrics['bmi']} ({metrics['category_label']}) | "
+                f"Daily Calories: {metrics['target_calories']} kcal | "
+                f"Protein: {metrics['protein_g']}g | Carbs: {metrics['carbs_g']}g | Fats: {metrics['fat_g']}g."
+            )
+        except Exception as e:
+            messages.error(request, f"Error calculating plan: {str(e)}")
+
+        return redirect(redirect_to)
+
+    return redirect('workouts:workout_list')

@@ -12,34 +12,19 @@ from .forms import MemberRegistrationForm, ReceptionistUserForm
 
 class CustomLoginView(LoginView):
     template_name = 'authentication/login.html'
-    
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect(self.get_role_redirect_url(self.request.user))
-        return super().dispatch(request, *args, **kwargs)
+    redirect_authenticated_user = False
         
     def get_success_url(self):
-        return self.get_role_redirect_url(self.request.user)
-        
-    def get_role_redirect_url(self, user):
-        if user.is_superuser or user.role == 'admin':
-            return '/dashboard/'
-        elif user.role == 'receptionist':
-            return '/reception/'
-        elif user.role == 'trainer':
-            return '/trainer/'
-        elif user.role == 'member':
-            return '/member/'
-        return '/'
+        return '/dashboard/'
 
 class CustomLogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('authentication:login')
+        return redirect('/login/')
         
     def post(self, request):
         logout(request)
-        return redirect('authentication:login')
+        return redirect('/login/')
 
 class RegisterView(View):
     def get(self, request):

@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Initialize Theme Choice from localStorage
-    const savedTheme = localStorage.getItem("gym-theme") || "light";
+    // Initialize Theme Choice from localStorage (Default: dark mode)
+    const savedTheme = localStorage.getItem("gym-theme") || "dark";
     applyTheme(savedTheme);
 });

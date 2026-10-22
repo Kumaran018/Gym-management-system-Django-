@@ -1,138 +1,120 @@
+{% load static %}
 <div class="sidebar" id="sidebar-wrapper">
-    <!-- Sidebar Header (Logo) -->
-    <div class="sidebar-brand">
-        <h4 class="m-0 text-dark fw-bold d-flex align-items-center">
-            <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 me-2" style="width: 38px; height: 38px;">
-                <i class="fa-solid fa-dumbbell"></i>
-            </span>
-            <span>Muscle Fit Gym</span>
-        </h4>
-    </div>
-    
-    <!-- Sidebar Menu Options -->
-    <div class="list-group list-group-flush py-3 flex-grow-1" style="overflow-y: auto;">
-        <!-- ROLE: ADMIN / SUPERUSER -->
-        {% if user.role == 'admin' or user.is_superuser %}
-            <div class="sidebar-label text-uppercase text-muted small">Admin Panel</div>
-            <a href="{% url 'dashboard:admin_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'admin_home' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-chart-pie"></i></span>Dashboard
-            </a>
-            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action {% if '/members/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-users"></i></span>Members
-            </a>
-            <a href="{% url 'trainers:list' %}" class="list-group-item list-group-item-action {% if '/trainers/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-tie"></i></span>Trainers
-            </a>
-            <a href="{% url 'authentication:receptionist_list' %}" class="list-group-item list-group-item-action {% if '/receptionists/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-gear"></i></span>Receptionists
-            </a>
-            <a href="{% url 'membership:plan_list' %}" class="list-group-item list-group-item-action {% if '/membership/plans/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-address-card"></i></span>Plans
-            </a>
-            <a href="{% url 'attendance:daily_attendance' %}" class="list-group-item list-group-item-action {% if '/attendance/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>Attendance
-            </a>
-            <a href="{% url 'payments:payment_history' %}" class="list-group-item list-group-item-action {% if '/payments/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-credit-card"></i></span>Payments
-            </a>
-            <a href="{% url 'reports:reports_index' %}" class="list-group-item list-group-item-action {% if '/reports/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-invoice-dollar"></i></span>Reports
-            </a>
-            <a href="{% url 'dashboard:system_settings' %}" class="list-group-item list-group-item-action {% if '/settings/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-sliders"></i></span>Settings
-            </a>
-            
-        <!-- ROLE: RECEPTIONIST -->
-        {% elif user.role == 'receptionist' %}
-            <div class="sidebar-label text-uppercase text-muted small">Reception Desk</div>
-            <a href="{% url 'dashboard:reception_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'reception_home' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-desktop"></i></span>Overview
-            </a>
-            <a href="{% url 'members:add' %}" class="list-group-item list-group-item-action {% if '/members/add/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-user-plus"></i></span>Register Member
-            </a>
-            <a href="{% url 'payments:record_payment' %}" class="list-group-item list-group-item-action {% if '/payments/record/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-arrows-rotate"></i></span>Renew Membership
-            </a>
-            <a href="{% url 'payments:record_payment' %}" class="list-group-item list-group-item-action {% if '/payments/record/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-circle-dollar-to-slot"></i></span>Collect Payments
-            </a>
-            <a href="{% url 'attendance:daily_attendance' %}" class="list-group-item list-group-item-action {% if '/attendance/daily/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-fingerprint"></i></span>Mark Attendance
-            </a>
-            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'list' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-magnifying-glass"></i></span>Search Members
-            </a>
-
-        <!-- ROLE: TRAINER -->
-        {% elif user.role == 'trainer' %}
-            <div class="sidebar-label text-uppercase text-muted small">Trainer Hub</div>
-            <a href="{% url 'dashboard:trainer_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'trainer_home' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-dumbbell"></i></span>Overview
-            </a>
-            <a href="{% url 'members:list' %}" class="list-group-item list-group-item-action">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-users-rectangle"></i></span>My Members
-            </a>
-            <a href="{% url 'workouts:workout_list' %}" class="list-group-item list-group-item-action {% if '/workouts/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-prescription"></i></span>Workout Programs
-            </a>
-            <a href="{% url 'diets:diet_list' %}" class="list-group-item list-group-item-action {% if '/diets/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-utensils"></i></span>Diet Templates
-            </a>
-            <a href="{% url 'attendance:attendance_history' %}" class="list-group-item list-group-item-action {% if '/attendance/history/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-clipboard-list"></i></span>Member Attendance
-            </a>
-
-        <!-- ROLE: MEMBER -->
-        {% elif user.role == 'member' %}
-            <div class="sidebar-label text-uppercase text-muted small">Member Zone</div>
-            <a href="{% url 'dashboard:member_home' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'member_home' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-user"></i></span>My Dashboard
-            </a>
-            <a href="{% url 'membership:member_plan_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'member_plan_list' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-address-card"></i></span>My Plan
-            </a>
-            <a href="{% url 'attendance:attendance_history' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'attendance_history' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-calendar-days"></i></span>Attendance
-            </a>
-            <a href="{% url 'workouts:workout_list' %}" class="list-group-item list-group-item-action {% if '/workouts/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-person-running"></i></span>My Workouts
-            </a>
-            <a href="{% url 'diets:diet_list' %}" class="list-group-item list-group-item-action {% if '/diets/' in request.path %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-apple-whole"></i></span>Nutrition Diet
-            </a>
-            <a href="{% url 'payments:payment_history' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'payment_history' %}active{% endif %}">
-                <span class="menu-icon-wrapper"><i class="fa-solid fa-file-invoice"></i></span>Payment History
-            </a>
-        {% endif %}
-        
-        <!-- Shared Space Menu -->
-        <div class="sidebar-label text-uppercase text-muted small">Shared Space</div>
-        <a href="{% url 'core:general_dashboard' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'general_dashboard' %}active{% endif %}">
-            <span class="menu-icon-wrapper"><i class="fa-solid fa-list-check"></i></span>Gym Catalog
-        </a>
-    </div>
-
-    <!-- Bottom User profile widget -->
-    {% if user.is_authenticated %}
-    <div class="sidebar-profile d-flex align-items-center gap-3">
-        {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="Profile" class="rounded-circle shadow-sm" style="width: 38px; height: 38px; object-fit: cover;">
-        {% else %}
-            <div class="avatar-placeholder rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 14px;">
-                {{ user.username|slice:":1"|upper }}
+    <!-- Top Part: Profile, Search, Navigation -->
+    <div>
+        <!-- User Profile Pill (Guy Hawkins style) -->
+        <div class="sidebar-user-pill" title="Current Profile">
+            {% if user.is_authenticated and user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" alt="Profile" class="sidebar-user-avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #bdf72b;">
+            {% else %}
+                <div class="sidebar-user-avatar-placeholder" style="width: 32px; height: 32px; border-radius: 50%; background: #1f2530; color: #bdf72b; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; border: 2px solid #bdf72b;">
+                    {{ user.username|slice:":1"|upper|default:"K" }}
+                </div>
+            {% endif %}
+            <div class="sidebar-user-name flex-grow-1" style="font-size: 13px; font-weight: 600; color: #f3f4f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {% if user.is_authenticated %}
+                    {{ user.get_full_name|default:user.username }}
+                {% else %}
+                    Guy Hawkins
+                {% endif %}
             </div>
-        {% endif %}
-        <div class="overflow-hidden flex-grow-1" style="line-height: 1.2;">
-            <h6 class="m-0 text-dark fw-bold text-truncate" style="font-size: 13px;">{{ user.get_full_name|default:user.username }}</h6>
-            <small class="text-muted text-truncate d-block" style="font-size: 11px;">{{ user.email|default:"No logged email" }}</small>
+            <i class="fa-solid fa-chevron-right text-muted" style="font-size: 10px;"></i>
         </div>
-        <form action="{% url 'authentication:logout' %}" method="post" class="m-0">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Logout" style="padding: 0 !important; background: transparent;">
-                <i class="fa-solid fa-right-from-bracket fa-lg"></i>
-            </button>
+
+        <!-- SEARCH BAR: Fixed icon overlap, functional search -->
+        <form method="GET" action="{% url 'members:list' %}" class="sidebar-search-box" style="position: relative; margin-bottom: 1.25rem;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280; font-size: 13px; pointer-events: none; z-index: 2;"></i>
+            <input type="text" name="search" class="sidebar-search-input" placeholder="Search..." style="width: 100%; background-color: #12151b !important; border: 1px solid rgba(255, 255, 255, 0.08) !important; border-radius: 12px !important; padding: 9px 42px 9px 36px !important; color: #f3f4f6 !important; font-size: 13px !important; outline: none !important;">
+            <span class="sidebar-search-shortcut" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #1e2430; color: #8b949e; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.08); pointer-events: none;">⌘K</span>
         </form>
+
+        <!-- Navigation Section: Dashboards -->
+        <div class="sidebar-nav-group">
+            <div class="sidebar-nav-title">Dashboards</div>
+            <div class="sidebar-nav-list" style="display: flex; flex-direction: column; gap: 4px;">
+                <!-- Overview: EXACT ACTIVE LIME PILL from screenshot -->
+                <a href="{% url 'dashboard:admin_home' %}" class="sidebar-nav-item {% if request.path == '/dashboard/' or request.path == '/member/' or request.path == '/trainer/' or request.path == '/reception/' or request.resolver_match.url_name == 'admin_home' %}active{% endif %}">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="{% url 'members:list' %}" class="sidebar-nav-item {% if '/members/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Members</span>
+                </a>
+                <a href="{% url 'trainers:list' %}" class="sidebar-nav-item {% if '/trainers/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-dumbbell"></i>
+                    <span>Trainers</span>
+                </a>
+                <!-- NUTRITION PLAN (Separate Feature as requested) -->
+                <a href="{% url 'diets:diet_list' %}" class="sidebar-nav-item {% if '/diets/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-apple-whole"></i>
+                    <span>Nutrition Plans</span>
+                </a>
+                <a href="{% url 'workouts:workout_list' %}" class="sidebar-nav-item {% if '/workouts/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-person-running"></i>
+                    <span>Workouts</span>
+                </a>
+                <a href="{% url 'attendance:daily_attendance' %}" class="sidebar-nav-item {% if '/attendance/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="{% url 'payments:payment_history' %}" class="sidebar-nav-item {% if '/payments/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="{% url 'reports:reports_index' %}" class="sidebar-nav-item {% if '/reports/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+                <!-- GYM CATALOG (Separate Feature with Add Option as requested) -->
+                <a href="{% url 'core:general_dashboard' %}" class="sidebar-nav-item {% if '/catalog/' in request.path or '/general/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Gym Catalog</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Section: Settings -->
+        <div class="sidebar-nav-group">
+            <div class="sidebar-nav-title">Settings</div>
+            <div class="sidebar-nav-list" style="display: flex; flex-direction: column; gap: 4px;">
+                <a href="{% url 'notifications:list_notifications' %}" class="sidebar-nav-item {% if '/notifications/' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>Messages</span>
+                </a>
+                <!-- CUSTOMER REVIEWS (Dedicated Feature as requested) -->
+                <a href="{% url 'core:customer_reviews' %}" class="sidebar-nav-item {% if '/reviews/' in request.path %}active{% endif %}">
+                    <i class="fa-regular fa-star"></i>
+                    <span>Customer Reviews</span>
+                </a>
+                <a href="{% url 'dashboard:system_settings' %}" class="sidebar-nav-item {% if '/settings/' in request.path %}active{% endif %}">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{% url 'core:home' %}" class="sidebar-nav-item">
+                    <i class="fa-regular fa-circle-question"></i>
+                    <span>Help Centre / Home</span>
+                </a>
+            </div>
+        </div>
     </div>
-    {% endif %}
+
+    <!-- Bottom: Muscle n Fitness Brand Logo -->
+    <div class="sidebar-bottom-logo" style="display: flex; align-items: center; gap: 10px; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.07);">
+        <div class="brand-icon-geom">
+            <i class="fa-solid fa-dumbbell"></i>
+        </div>
+        <div class="brand-name-text">
+            Muscle n <span>Fitness</span>
+        </div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'authentication:logout' %}" class="topbar-btn ms-auto text-danger" title="Sign Out" style="width: 28px; height: 28px; font-size: 13px;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+        {% else %}
+        <a href="{% url 'authentication:login' %}" class="topbar-btn ms-auto text-lime" title="Sign In" style="width: 28px; height: 28px; font-size: 13px; color: #bdf72b !important;">
+            <i class="fa-solid fa-right-to-bracket"></i>
+        </a>
+        {% endif %}
+    </div>
 </div>

@@ -1,302 +1,492 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Super Admin Dashboard - Muscle Fit Gym{% endblock %}
+{% block title %}Dashboard Overview - Muscle n Fitness{% endblock %}
 
 {% block content %}
-<!-- Premium Hero Greeting Section -->
-<div class="card card-premium border-0 p-4 mb-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: none;">
-    <div class="row align-items-center g-3">
-        <div class="col-md-8">
-            <h2 class="fw-bold m-0 text-white"><span id="live-greeting">Welcome Back</span>, Admin 👋</h2>
-            <p class="text-slate-300 m-0 mt-1 small">Your central command dashboard. Here's your gym analytics summary for today.</p>
-        </div>
-        <div class="col-md-4 text-md-end d-flex flex-column align-items-md-end gap-1">
-            <h3 class="fw-extrabold text-primary m-0" id="live-clock">00:00:00 AM</h3>
-            <span class="text-slate-400 small"><i class="fa-solid fa-cloud-sun text-warning me-1"></i>24°C Sunny | Bengaluru</span>
-        </div>
-    </div>
-</div>
-
-<!-- SaaS Metric Cards Grid -->
-<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
-    <!-- Card 1: Total Members -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Total Members</span>
-                    <h2 class="fw-bold m-0 mt-2 text-dark">{{ total_members }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-users fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+12%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px;">
-                    <path d="M0 25 Q15 15, 30 20 T60 5 T100 15" />
-                </svg>
+<div class="row g-4 m-0 p-0">
+    <!-- =========================================================================
+         CENTRAL MAIN CONTENT COLUMN (Cards, Charts, Tables, Promo)
+         ========================================================================= -->
+    <div class="col-12 col-xxl-9 col-xl-8 p-0 pe-xxl-3 pe-xl-2">
+        <!-- Section Header: Overview + Timeframe Pill -->
+        <div class="overview-header">
+            <h2 class="overview-title">Overview</h2>
+            <div class="dropdown">
+                <button class="timeframe-pill dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <span>Today</span>
+                    <i class="fa-solid fa-chevron-down ms-1" style="font-size: 10px;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="background: var(--bg-card); border: 1px solid var(--border-subtle) !important;">
+                    <li><a class="dropdown-item text-secondary small py-2 active" href="#">Today</a></li>
+                    <li><a class="dropdown-item text-secondary small py-2" href="#">This Week</a></li>
+                    <li><a class="dropdown-item text-secondary small py-2" href="#">This Month</a></li>
+                    <li><a class="dropdown-item text-secondary small py-2" href="#">This Quarter</a></li>
+                </ul>
             </div>
         </div>
-    </div>
 
-    <!-- Card 2: Active Members -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Active Subscribers</span>
-                    <h2 class="fw-bold m-0 mt-2 text-success">{{ active_members }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-success text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-user-check fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+8%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #22c55e;">
-                    <path d="M0 20 Q20 5, 45 25 T85 10 T100 5" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: Today's Checkins -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Today Check-ins</span>
-                    <h2 class="fw-bold m-0 mt-2 text-info">{{ today_attendance }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-info text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-fingerprint fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+15%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #6366f1;">
-                    <path d="M0 25 Q15 5, 40 15 T75 22 T100 12" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 4: Monthly Revenue -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Monthly Collections</span>
-                    <h2 class="fw-bold m-0 mt-2 text-primary">₹{{ monthly_revenue|floatformat:0 }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-warning text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-sack-dollar fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+10%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #3b82f6;">
-                    <path d="M0 30 Q20 10, 50 18 T80 5 T100 2" />
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
-    <!-- Card 5: Expiring Plans -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Expiring Plans</span>
-                    <h2 class="fw-bold m-0 mt-2 text-danger">{{ expiring_memberships }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-danger text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-hourglass-end fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-down me-1"></i>-4%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #ef4444;">
-                    <path d="M0 5 Q25 20, 50 10 T85 25 T100 28" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 6: Trainers -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Coaching Staff</span>
-                    <h2 class="fw-bold m-0 mt-2 text-dark">{{ total_trainers }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-user-tie fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+5%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #6b7280;">
-                    <path d="M0 25 H30 L50 10 L70 20 H100" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 7: Receptionists -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">Receptionists</span>
-                    <h2 class="fw-bold m-0 mt-2 text-dark">{{ total_receptionists }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-dark text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-user-gear fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-secondary-subtle text-secondary">Static</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px; stroke: #9ca3af;">
-                    <path d="M0 15 H100" />
-                </svg>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 8: New Registrations -->
-    <div class="col">
-        <div class="card card-premium border-0 h-100 p-4 d-flex flex-column justify-content-between">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="text-muted small text-uppercase font-weight-bold d-block">New Sign-ups</span>
-                    <h2 class="fw-bold m-0 mt-2 text-primary">{{ new_members|length }}</h2>
-                </div>
-                <div class="menu-icon-wrapper m-0 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;">
-                    <i class="fa-solid fa-user-plus fa-lg"></i>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top border-light">
-                <span class="trend-badge bg-success-subtle text-success"><i class="fa-solid fa-arrow-up me-1"></i>+20%</span>
-                <svg class="sparkline-svg" viewBox="0 0 100 30" style="width: 60px; height: 20px;">
-                    <path d="M0 25 Q15 5, 45 10 T90 2 T100 15" />
-                </svg>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Admin Controls -->
-<div class="card card-premium border-0 shadow-sm p-4 mb-4">
-    <h5 class="fw-bold mb-3"><i class="fa-solid fa-bolt text-warning me-2"></i>Quick Gym Admin Controls</h5>
-    <div class="d-flex flex-wrap gap-2">
-        <a href="{% url 'members:add' %}" class="btn btn-premium d-inline-flex align-items-center gap-2 py-2 px-4"><i class="fa-solid fa-user-plus"></i>Add Member</a>
-        <a href="{% url 'attendance:daily_attendance' %}" class="btn btn-ghost d-inline-flex align-items-center gap-2 py-2 px-4"><i class="fa-solid fa-fingerprint"></i>Mark Attendance</a>
-        <a href="{% url 'membership:plan_add' %}" class="btn btn-ghost d-inline-flex align-items-center gap-2 py-2 px-4"><i class="fa-solid fa-plus"></i>Create Plan</a>
-        <a href="{% url 'payments:record_payment' %}" class="btn btn-ghost d-inline-flex align-items-center gap-2 py-2 px-4"><i class="fa-solid fa-circle-dollar-to-slot"></i>Collect Payment</a>
-    </div>
-</div>
-
-<!-- Charts Section -->
-<div class="row g-4 mb-4">
-    <!-- Revenue Chart -->
-    <div class="col-lg-8">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-chart-line text-primary me-2"></i>Revenue Analytics</h5>
-            <div style="position: relative; height:300px; width:100%">
-                <canvas id="revenueChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Attendance Chart -->
-    <div class="col-lg-4">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-chart-bar text-warning me-2"></i>Weekly Attendance</h5>
-            <div style="position: relative; height:300px; width:100%">
-                <canvas id="attendanceChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Grid Details lists -->
-<div class="row g-4 mb-4">
-    <!-- Recent Activity Timeline -->
-    <div class="col-xl-6">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Recent Activity</h5>
-            
-            <div class="activity-timeline">
-                <!-- Activity 1: Member joined -->
-                {% for member in new_members %}
-                <div class="activity-item">
-                    <div class="activity-badge bg-primary text-white">
-                        <i class="fa-solid fa-user-plus" style="font-size: 11px;"></i>
-                    </div>
+        <!-- ROW 1: TOP 4 KPI STAT CARDS (Exact match to screenshot) -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+            <!-- Card 1: Net revenue -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
                     <div>
-                        <h6 class="m-0 text-dark fw-bold" style="font-size: 13px;">New registration logged</h6>
-                        <p class="text-muted small m-0 mt-1">Member <strong>{{ member.user.get_full_name }}</strong> registered successfully.</p>
-                        <span class="text-slate-400 small" style="font-size: 10px;">Joined {{ member.join_date|date:"M d, Y" }}</span>
+                        <div class="kpi-title">Net revenue</div>
+                        <div class="kpi-value">$3,131,021</div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        <span>0.4% vs last month</span>
                     </div>
                 </div>
-                {% endfor %}
+            </div>
 
-                <!-- Activity 2: Payment completed -->
-                {% for payment in recent_payments %}
-                <div class="activity-item">
-                    <div class="activity-badge bg-success text-white">
-                        <i class="fa-solid fa-receipt" style="font-size: 11px;"></i>
-                    </div>
+            <!-- Card 2: ARR -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
                     <div>
-                        <h6 class="m-0 text-dark fw-bold" style="font-size: 13px;">Payment Transaction completed</h6>
-                        <p class="text-muted small m-0 mt-1">Invoice <strong>{{ payment.invoice_number }}</strong> of ₹{{ payment.amount }} paid by {{ payment.member.user.get_full_name }}.</p>
-                        <span class="text-slate-400 small" style="font-size: 10px;">Paid {{ payment.payment_date|timesince }} ago</span>
+                        <div class="kpi-title">ARR</div>
+                        <div class="kpi-value">$1,511,121</div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        <span>32% vs last quarter</span>
                     </div>
                 </div>
-                {% endfor %}
+            </div>
+
+            <!-- Card 3: Quarterly revenue goal (Radial Semi-Gauge) -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">Quarterly revenue goal</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="kpi-value m-0">71%</div>
+                            <!-- Semi-circular SVG Gauge Chart -->
+                            <div style="width: 80px; height: 42px; position: relative;">
+                                <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                                    <path d="M 10 45 A 35 35 0 0 1 90 45" fill="none" stroke="#222731" stroke-width="8" stroke-linecap="round"/>
+                                    <path d="M 10 45 A 35 35 0 0 1 72 15" fill="none" stroke="#bdf72b" stroke-width="8" stroke-linecap="round"/>
+                                    <!-- Indicator Needle / Center -->
+                                    <circle cx="50" cy="45" r="4" fill="#bdf72b" />
+                                    <line x1="50" y1="45" x2="68" y2="20" stroke="#bdf72b" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-muted" style="font-size: 11px;">Goal: $1.1M</div>
+                </div>
+            </div>
+
+            <!-- Card 4: New orders -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">New orders</div>
+                        <div class="kpi-value">18,221</div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                        <span>11% vs last quarter</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: SALES OVERVIEW + MINI CARDS + TOTAL PROFIT (Exact match) -->
+        <div class="row g-3 mb-4">
+            <!-- Left: Sales Overview with Donut Chart -->
+            <div class="col-12 col-lg-7">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div class="card-header-action">
+                        <h3 class="card-header-title">Sales Overview</h3>
+                        <button class="card-menu-btn" title="Options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+
+                    <div class="row align-items-center g-3 my-auto">
+                        <!-- Donut Canvas -->
+                        <div class="col-12 col-sm-6 text-center position-relative">
+                            <div style="width: 170px; height: 170px; margin: 0 auto; position: relative;">
+                                <canvas id="salesDonutChart"></canvas>
+                                <div class="donut-center-info">
+                                    <div class="donut-center-num">102k</div>
+                                    <div class="donut-center-label">Weekly Visits</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Breakdown Stats -->
+                        <div class="col-12 col-sm-6">
+                            <!-- Number of Sales Badge -->
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(189, 247, 43, 0.15); color: var(--accent-lime); font-size: 13px;">
+                                    <i class="fa-solid fa-dollar-sign"></i>
+                                </span>
+                                <div>
+                                    <div class="text-muted" style="font-size: 11px;">Number of Sales</div>
+                                    <div class="fw-bold text-white fs-5">$71,020</div>
+                                </div>
+                            </div>
+
+                            <!-- 4 Category Breakdown Grid -->
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #bdf72b;"></span>
+                                        <span class="text-secondary" style="font-size: 12px;">Electronic</span>
+                                    </div>
+                                    <div class="fw-bold text-white ms-3" style="font-size: 13px;">$55,640</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #557b12;"></span>
+                                        <span class="text-secondary" style="font-size: 12px;">Furniture</span>
+                                    </div>
+                                    <div class="fw-bold text-white ms-3" style="font-size: 13px;">$11,420</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #94a3b8;"></span>
+                                        <span class="text-secondary" style="font-size: 12px;">Clothes</span>
+                                    </div>
+                                    <div class="fw-bold text-white ms-3" style="font-size: 13px;">$1,840</div>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #38bdf8;"></span>
+                                        <span class="text-secondary" style="font-size: 12px;">Shoes</span>
+                                    </div>
+                                    <div class="fw-bold text-white ms-3" style="font-size: 13px;">$2,120</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Stacked Mini Cards + Total Profit Wave Chart -->
+            <div class="col-12 col-lg-5">
+                <div class="d-flex flex-column gap-3 h-100">
+                    <!-- 2 Mini Cards Row -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-icon">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                </div>
+                                <div class="mini-stat-label">New customers:</div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="mini-stat-val">862</span>
+                                    <span class="text-danger" style="font-size: 11px; font-weight: 600;">-8%</span>
+                                </div>
+                                <small class="text-muted" style="font-size: 10px;">Last Week</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-icon">
+                                    <i class="fa-solid fa-chart-column"></i>
+                                </div>
+                                <div class="mini-stat-label">Total profit:</div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="mini-stat-val">$25.6k</span>
+                                    <span class="text-lime" style="font-size: 11px; font-weight: 600; color: var(--accent-lime);">+42%</span>
+                                </div>
+                                <small class="text-muted" style="font-size: 10px;">Weekly Profit</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Profit Glowing Wave Chart -->
+                    <div class="total-profit-card flex-grow-1 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="card-header-title text-white" style="font-size: 14px;">Total Profit:</div>
+                            <div class="total-profit-meta">February, 2024</div>
+                            <div class="total-profit-num">$136,755.77</div>
+                        </div>
+                        <div style="height: 100px; width: 100%;">
+                            <canvas id="profitWaveChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: CUSTOMER LIST + PREMIUM PLAN PROMO CARD (Exact match) -->
+        <div class="row g-3">
+            <!-- Left: Customer List Table -->
+            <div class="col-12 col-lg-8">
+                <div class="card-dark h-100">
+                    <div class="card-header-action">
+                        <h3 class="card-header-title">Customer list</h3>
+                        <button class="card-menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Name <i class="fa-solid fa-sort ms-1" style="font-size: 10px;"></i></th>
+                                    <th>Deals <i class="fa-solid fa-sort ms-1" style="font-size: 10px;"></i></th>
+                                    <th>Total Deal Value <i class="fa-solid fa-sort ms-1" style="font-size: 10px;"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Row 1: Danny Liu -->
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Danny" class="customer-avatar">
+                                            <div>
+                                                <div class="customer-name">Danny Liu</div>
+                                                <div class="customer-email">danny@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium text-secondary">1,023</td>
+                                    <td class="fw-bold text-white">$37,431</td>
+                                </tr>
+
+                                <!-- Row 2: Bella Deviant -->
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&auto=format&fit=crop&q=80" alt="Bella" class="customer-avatar">
+                                            <div>
+                                                <div class="customer-name">Bella Deviant</div>
+                                                <div class="customer-email">bella@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium text-secondary">963</td>
+                                    <td class="fw-bold text-white">$30,423</td>
+                                </tr>
+
+                                <!-- Row 3: Darrell Steward -->
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Darrell" class="customer-avatar">
+                                            <div>
+                                                <div class="customer-name">Darrell Steward</div>
+                                                <div class="customer-email">darrell@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium text-secondary">843</td>
+                                    <td class="fw-bold text-white">$28,549</td>
+                                </tr>
+
+                                {% for member in new_members %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="customer-avatar rounded-circle d-flex align-items-center justify-content-center bg-dark text-lime fw-bold" style="border: 1px solid var(--accent-lime); font-size: 12px; color: var(--accent-lime);">
+                                                {{ member.user.username|slice:":1"|upper }}
+                                            </div>
+                                            <div>
+                                                <div class="customer-name">{{ member.user.get_full_name|default:member.user.username }}</div>
+                                                <div class="customer-email">{{ member.user.email|default:"member@gym.local" }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium text-secondary">1</td>
+                                    <td class="fw-bold text-white">Active Plan</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Premium Plan Promo Card (Exact Screenshot) -->
+            <div class="col-12 col-lg-4">
+                <div class="promo-plan-card h-100">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="promo-badge">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>Premium Plane</span>
+                        </div>
+                        <button class="card-menu-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                    </div>
+
+                    <div>
+                        <div class="promo-price">
+                            <span>Rs. 2,500</span>
+                            <div class="promo-price-period">
+                                <div>Per Quarter</div>
+                                <div>Per User</div>
+                            </div>
+                        </div>
+                        <p class="promo-desc">
+                            Improve your workplace, view and analyze your profits and losses <i class="fa-solid fa-chart-pie ms-1"></i>
+                        </p>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{% url 'membership:plan_list' %}" class="promo-btn-lime flex-grow-1 text-decoration-none">
+                            Get Started
+                        </a>
+                        <button class="promo-btn-lime p-0" style="width: 44px; height: 44px; flex-shrink: 0;" title="Featured">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Upcoming Renewals -->
-    <div class="col-xl-6">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-calendar-days text-danger me-2"></i>Upcoming Renewals</h5>
-            <div class="table-responsive">
-                <table class="table align-middle text-nowrap mb-0">
-                    <thead class="table-light-head">
-                        <tr>
-                            <th>Member</th>
-                            <th>Plan</th>
-                            <th>Renewal Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for mem in expiring_list %}
-                        <tr>
-                            <td>
-                                <span class="fw-bold text-dark">{{ mem.member.user.get_full_name }}</span>
-                                <span class="text-muted d-block small" style="font-size: 10px;">ID: {{ mem.member.member_id }}</span>
-                            </td>
-                            <td>{{ mem.plan.name }}</td>
-                            <td class="text-danger fw-semibold">{{ mem.end_date|date:"M d, Y" }}</td>
-                            <td>
-                                <span class="badge bg-warning-subtle text-warning">Expiring</span>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No plans due to expire soon.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- =========================================================================
+         RIGHT PANEL COLUMN: NOTIFICATIONS, ACTIVITIES, CONTACTS (Exact match)
+         ========================================================================= -->
+    <div class="col-12 col-xxl-3 col-xl-4 p-0">
+        <div class="right-panel-wrapper h-100">
+            <!-- 1. NOTIFICATIONS SECTION -->
+            <div>
+                <h4 class="right-panel-title">Notifications</h4>
+                
+                <div class="notif-item">
+                    <div class="notif-badge-icon">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-text">56 New users registered.</div>
+                        <div class="notif-time">Just now</div>
+                    </div>
+                </div>
+
+                <div class="notif-item">
+                    <div class="notif-badge-icon">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-text">132 Orders placed.</div>
+                        <div class="notif-time">59 Minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="notif-item">
+                    <div class="notif-badge-icon">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-text">Funds have been withdrawn.</div>
+                        <div class="notif-time">12 Hours ago</div>
+                    </div>
+                </div>
+
+                <div class="notif-item">
+                    <div class="notif-badge-icon">
+                        <i class="fa-regular fa-envelope"></i>
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-text">5 Unread messages.</div>
+                        <div class="notif-time">Today, 11:59 PM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ACTIVITIES SECTION -->
+            <div>
+                <h4 class="right-panel-title">Activities</h4>
+
+                <div class="activity-item">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50&auto=format&fit=crop&q=80" alt="User" class="activity-avatar">
+                    <div>
+                        <div class="activity-text"><strong class="text-white">Changed the style.</strong></div>
+                        <div class="activity-time">Just now</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&auto=format&fit=crop&q=80" alt="User" class="activity-avatar">
+                    <div>
+                        <div class="activity-text"><strong class="text-white">177 New products added.</strong></div>
+                        <div class="activity-time">47 Minutes ago</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=50&auto=format&fit=crop&q=80" alt="User" class="activity-avatar">
+                    <div>
+                        <div class="activity-text"><strong class="text-white">11 Products have been archived.</strong></div>
+                        <div class="activity-time">1 Days ago</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=50&auto=format&fit=crop&q=80" alt="User" class="activity-avatar">
+                    <div>
+                        <div class="activity-text">Page "Toys" has been removed.</div>
+                        <div class="activity-time">Feb 2, 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. CONTACTS OF YOUR MANAGERS (Exact match) -->
+            <div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="right-panel-title m-0">Contacts of your managers</h4>
+                </div>
+
+                <div class="contacts-list">
+                    <!-- Contact 1: Daniel Craig -->
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="Daniel" class="contact-avatar">
+                            <span class="contact-name">Daniel Craig</span>
+                        </div>
+                        <button class="contact-more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+
+                    <!-- Contact 2: Kate Morrison -->
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="Kate" class="contact-avatar">
+                            <span class="contact-name">Kate Morrison</span>
+                        </div>
+                        <button class="contact-more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+
+                    <!-- Contact 3: Nataniel Donowan (ACTIVE LIME CAPSULE FROM SCREENSHOT) -->
+                    <div class="contact-item active">
+                        <div class="contact-info">
+                            <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=60&auto=format&fit=crop&q=80" alt="Nataniel" class="contact-avatar">
+                            <span class="contact-name">Nataniel Donowan</span>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="contact-action-btn" title="Call"><i class="fa-solid fa-phone"></i></button>
+                            <button class="contact-action-btn" title="Message"><i class="fa-solid fa-comment"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Contact 4: Elisabeth Wayne -->
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=60&auto=format&fit=crop&q=80" alt="Elisabeth" class="contact-avatar">
+                            <span class="contact-name">Elisabeth Wayne</span>
+                        </div>
+                        <button class="contact-more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+
+                    <!-- Contact 5: Felicia Raspet -->
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="Felicia" class="contact-avatar">
+                            <span class="contact-name">Felicia Raspet</span>
+                        </div>
+                        <button class="contact-more-btn"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                </div>
+
+                <!-- Bottom Expand Widget -->
+                <div class="text-end mt-4">
+                    <button class="topbar-btn ms-auto" title="Expand View" style="border: 1px solid var(--border-subtle);">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center" style="font-size: 11px;"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -305,97 +495,88 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Live Dynamic Greeting Clock Logic
-    function updateClock() {
-        const now = new Date();
-        const hours = now.getHours();
-        let greeting = "Good Evening";
-        if (hours < 12) greeting = "Good Morning";
-        else if (hours < 17) greeting = "Good Afternoon";
-        
-        const liveGreeting = document.getElementById('live-greeting');
-        if (liveGreeting) liveGreeting.innerText = greeting;
-        
-        const liveClock = document.getElementById('live-clock');
-        if (liveClock) liveClock.innerText = now.toLocaleTimeString();
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Sales Overview Donut Chart
+    const donutCtx = document.getElementById('salesDonutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Electronic', 'Furniture', 'Clothes', 'Shoes'],
+                datasets: [{
+                    data: [55640, 11420, 1840, 2120],
+                    backgroundColor: [
+                        '#bdf72b', // Neon lime
+                        '#557b12', // Olive lime
+                        '#94a3b8', // Slate grey
+                        '#38bdf8'  // Cyan
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '76%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#15181e',
+                        titleColor: '#fff',
+                        bodyColor: '#bdf72b',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1
+                    }
+                }
+            }
+        });
     }
-    setInterval(updateClock, 1000);
-    updateClock();
 
-    // 1. Revenue Chart (Line Chart)
-    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-    const revenueLabels = {{ revenue_labels|safe }};
-    const revenueData = {{ revenue_data|safe }};
-    
-    new Chart(ctxRevenue, {
-        type: 'line',
-        data: {
-            labels: revenueLabels,
-            datasets: [{
-                label: 'Monthly Sales (₹)',
-                data: revenueData,
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.35,
-                pointBackgroundColor: '#2563eb',
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
+    // 2. Total Profit Glowing Wave Area Chart
+    const profitCtx = document.getElementById('profitWaveChart');
+    if (profitCtx) {
+        const ctx2d = profitCtx.getContext('2d');
+        const gradient = ctx2d.createLinearGradient(0, 0, 0, 100);
+        gradient.addColorStop(0, 'rgba(189, 247, 43, 0.4)');
+        gradient.addColorStop(0.7, 'rgba(16, 185, 129, 0.1)');
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+        new Chart(profitCtx, {
+            type: 'line',
+            data: {
+                labels: ['1', '5', '10', '15', '20', '25', '28'],
+                datasets: [{
+                    data: [45, 62, 58, 85, 70, 95, 90],
+                    borderColor: '#bdf72b',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    tension: 0.45,
+                    fill: true,
+                    backgroundColor: gradient
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.04)' }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#15181e',
+                        titleColor: '#fff',
+                        bodyColor: '#bdf72b',
+                        borderColor: 'rgba(189,247,43,0.3)',
+                        borderWidth: 1
+                    }
                 },
-                x: {
-                    grid: { display: false }
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
                 }
             }
-        }
-    });
-
-    // 2. Attendance Chart (Bar Chart)
-    const ctxAttendance = document.getElementById('attendanceChart').getContext('2d');
-    const attendanceLabels = {{ attendance_labels|safe }};
-    const attendanceData = {{ attendance_data|safe }};
-
-    new Chart(ctxAttendance, {
-        type: 'bar',
-        data: {
-            labels: attendanceLabels,
-            datasets: [{
-                label: 'Attendance',
-                data: attendanceData,
-                backgroundColor: '#3b82f6',
-                borderRadius: 6,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.04)' }
-                },
-                x: {
-                    grid: { display: false }
-                }
-            }
-        }
-    });
+        });
+    }
 });
 </script>
 {% endblock %}

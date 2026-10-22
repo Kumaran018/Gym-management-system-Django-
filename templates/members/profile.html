@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ member.user.get_full_name }} Profile - Muscle Fit Gym{% endblock %}
+{% block title %}{{ member.user.get_full_name }} Profile - Muscle n Fitness{% endblock %}
 
 {% block content %}
 <div class="row g-4">
@@ -74,6 +74,42 @@
                         <span class="text-muted">Unassigned</span>
                     {% endif %}
                 </div>
+            </div>
+        </div>
+
+        <!-- Biometrics & Body Composition Card -->
+        <div class="card card-premium p-4 mb-4" style="background: #15181e; border: 1px solid rgba(189, 247, 43, 0.25); border-radius: 18px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-uppercase m-0" style="color: #bdf72b; font-size: 11px; letter-spacing: 0.06em;">
+                    <i class="fa-solid fa-weight-scale me-1"></i>Body Measurements & BMI
+                </h6>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#profileBiometricsModal">
+                    <i class="fa-solid fa-pen-to-square me-1" style="color: #bdf72b;"></i>Recalculate
+                </button>
+            </div>
+            <div class="row g-2 text-center mb-3">
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">Height</span>
+                        <span class="fw-bold" style="color: #ffffff; font-size: 15px;">{{ member.height_cm|default:"--" }} cm</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">Weight</span>
+                        <span class="fw-bold" style="color: #bdf72b; font-size: 15px;">{{ member.weight_kg|default:"--" }} kg</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-2 rounded-3" style="background: #11141a; border: 1px solid rgba(255,255,255,0.06);">
+                        <span class="text-muted d-block small" style="font-size: 11px;">BMI</span>
+                        <span class="fw-bold" style="color: #06b6d4; font-size: 15px;">{{ member.bmi|default:"--" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="p-2 rounded-3 text-center" style="background: rgba(189, 247, 43, 0.08); border: 1px solid rgba(189, 247, 43, 0.2);">
+                <span class="small fw-semibold d-block" style="color: #bdf72b; font-size: 12px;">{{ member.recommended_focus }}</span>
+                <span class="text-muted small" style="font-size: 10.5px;">{{ member.bmi_category }}</span>
             </div>
         </div>
 
@@ -259,6 +295,66 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Biometrics Modal -->
+<div class="modal fade" id="profileBiometricsModal" tabindex="-1" aria-labelledby="profileBiometricsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #15181e; border: 1px solid rgba(189, 247, 43, 0.3); border-radius: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.7);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(189, 247, 43, 0.15); display: flex; align-items: center; justify-content: center; color: #bdf72b; font-size: 18px;">
+                        <i class="fa-solid fa-weight-scale"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-white m-0" id="profileBiometricsModalLabel">Update Body Measurements</h5>
+                        <span class="text-muted small">Auto-reassigns Workout & Nutrition Plans</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="{% url 'members:assign_by_metrics' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="member_id" value="{{ member.id }}">
+                <input type="hidden" name="next" value="{% url 'members:profile' member.pk %}">
+
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label font-weight-bold text-muted small">
+                                <i class="fa-solid fa-arrows-up-down me-1" style="color: #bdf72b;"></i>Height (cm)
+                            </label>
+                            <input type="number" step="0.1" name="height_cm" class="form-control" placeholder="e.g. 178" value="{{ member.height_cm|default:'178' }}" required style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); font-size: 16px; font-weight: 700;">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label font-weight-bold text-muted small">
+                                <i class="fa-solid fa-weight-scale me-1" style="color: #06b6d4;"></i>Weight (kg)
+                            </label>
+                            <input type="number" step="0.1" name="weight_kg" class="form-control" placeholder="e.g. 74" value="{{ member.weight_kg|default:'75' }}" required style="background: #11141a; color: #ffffff; border: 1px solid rgba(255,255,255,0.1); font-size: 16px; font-weight: 700;">
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-3" style="background: rgba(189, 247, 43, 0.05); border: 1px solid rgba(189, 247, 43, 0.15);">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-check" style="color: #bdf72b;"></i>
+                            <span class="small fw-semibold" style="color: #ffffff;">Intelligent Fitness Calibration</span>
+                        </div>
+                        <p class="small text-muted m-0 mt-1" style="font-size: 11px;">
+                            Saving new measurements will compute BMI, BMR, and re-prescribe the optimal Workout Routine and Caloric Nutrition Plan for {{ member.user.get_full_name|default:member.user.username }}.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-premium px-5">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Recalculate & Save
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ action }} Member - Muscle Fit Gym{% endblock %}
+{% block title %}{{ action }} Member - Muscle n Fitness{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -91,6 +91,19 @@
                             <label class="form-label font-weight-bold text-muted small">Date of Birth</label>
                             {{ member_form.date_of_birth }}
                             {% if member_form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ member_form.date_of_birth.errors.0 }}</div>{% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small"><i class="fa-solid fa-arrows-up-down me-1" style="color: #bdf72b;"></i>Height (cm)</label>
+                                {{ member_form.height_cm }}
+                                {% if member_form.height_cm.errors %}<div class="text-danger small mt-1">{{ member_form.height_cm.errors.0 }}</div>{% endif %}
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label font-weight-bold text-muted small"><i class="fa-solid fa-weight-scale me-1" style="color: #06b6d4;"></i>Weight (kg)</label>
+                                {{ member_form.weight_kg }}
+                                {% if member_form.weight_kg.errors %}<div class="text-danger small mt-1">{{ member_form.weight_kg.errors.0 }}</div>{% endif %}
+                            </div>
                         </div>
 
                         <div class="mb-3">

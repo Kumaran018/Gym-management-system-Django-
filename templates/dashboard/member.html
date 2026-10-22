@@ -1,238 +1,519 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}My Dashboard - Antigravity Gym{% endblock %}
+{% block title %}My Fitness Overview - Muscle n Fitness{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card card-premium p-4 border-0 shadow-sm rounded-4" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white;">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <h2 class="fw-extrabold m-0 text-white">Hello, {{ user.get_full_name|default:user.username }}!</h2>
-                    <p class="text-slate-200 m-0 mt-1 text-light-muted">Welcome to your personal gym dashboard. Let's reach your health goals today!</p>
+<div class="row g-4 m-0 p-0">
+    <!-- =========================================================================
+         CENTRAL MAIN CONTENT COLUMN: PERSONAL MEMBER STATS, CHARTS & ACTIVITIES
+         ========================================================================= -->
+    <div class="col-12 col-xxl-9 col-xl-8 p-0 pe-xxl-3 pe-xl-2">
+        <!-- Section Header: Overview + Personal Status Pill -->
+        <div class="overview-header">
+            <div>
+                <h2 class="overview-title">Overview</h2>
+                <p class="text-secondary small m-0">Personal Fitness Summary & Activity Log for <strong class="text-lime">{{ user.get_full_name|default:user.username }}</strong></p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge" style="background: rgba(189, 247, 43, 0.12); color: var(--accent-lime); border: 1px solid rgba(189, 247, 43, 0.25); padding: 7px 14px; border-radius: 20px; font-weight: 600; font-size: 12px;">
+                    <i class="fa-solid fa-circle-check me-1"></i> {{ current_membership.plan.name|default:"Standard Plan" }} ({{ days_remaining }}d left)
+                </span>
+                <a href="{% url 'workouts:workout_list' %}" class="timeframe-pill text-decoration-none" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-ruler-combined" style="color: var(--accent-lime);"></i>
+                    <span>Recalculate Biometrics</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- ROW 1: TOP 4 PERSONAL KPI STAT CARDS (Strictly for this member) -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+            <!-- Card 1: Gym Attendance -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">Gym Attendance</div>
+                        <div class="kpi-value">{{ total_checkins }} <span style="font-size: 15px; font-weight: 500; color: #8b949e;">Sessions</span></div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-arrow-trend-up text-lime"></i>
+                        <span>{{ monthly_checkins }} sessions this month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Body Biometrics & BMI -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">Body Assessment</div>
+                        <div class="kpi-value">{{ member.bmi|default:"--" }} <span style="font-size: 15px; font-weight: 500; color: var(--accent-lime);">BMI</span></div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-weight-scale text-lime"></i>
+                        <span>{{ member.height_cm|floatformat:0 }}cm / {{ member.weight_kg|floatformat:1 }}kg ({{ member.bmi_category }})</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Active Workout Split -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">Prescribed Workout</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="kpi-value m-0">{{ exercises_count }} <span style="font-size: 14px; font-weight: 500; color: #8b949e;">Exercises</span></div>
+                            <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: var(--accent-lime); font-size: 11px;">Active</span>
+                        </div>
+                    </div>
+                    <div class="text-muted text-truncate" style="font-size: 11px;" title="{{ active_workout.notes }}">
+                        {{ active_workout.notes|truncatewords:5|default:"Push-Pull-Legs Athletic Split" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Total Fees Paid & Invoices -->
+            <div class="col">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="kpi-title">My Total Payments</div>
+                        <div class="kpi-value">₹{{ total_paid|floatformat:0 }}</div>
+                    </div>
+                    <div class="kpi-trend">
+                        <i class="fa-solid fa-circle-check text-lime"></i>
+                        <span>{{ paid_invoices_count }} Invoices Settled (Paid)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: PERSONAL NUTRITION FUEL DONUT + ATTENDANCE PULSE -->
+        <div class="row g-3 mb-4">
+            <!-- Left: Personal Diet & Caloric Target Donut Chart -->
+            <div class="col-12 col-lg-7">
+                <div class="card-dark h-100 d-flex flex-column justify-content-between">
+                    <div class="card-header-action">
+                        <div>
+                            <h3 class="card-header-title">My Daily Nutrition & Fuel Breakdown</h3>
+                            <div class="text-muted" style="font-size: 11px;">Calculated specifically for your {{ member.weight_kg }}kg body weight</div>
+                        </div>
+                        <a href="{% url 'diets:diet_list' %}" class="card-menu-btn text-decoration-none text-lime" title="View Nutrition Plan">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+
+                    <div class="row align-items-center g-3 my-auto py-2">
+                        <!-- Donut Canvas -->
+                        <div class="col-12 col-sm-6 text-center position-relative">
+                            <div style="width: 175px; height: 175px; margin: 0 auto; position: relative;">
+                                <canvas id="memberDietDonutChart"></canvas>
+                                <div class="donut-center-info">
+                                    <div class="donut-center-num" style="color: var(--accent-lime); font-size: 22px;">{{ daily_calories }}</div>
+                                    <div class="donut-center-label">kcal / day</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Breakdown Stats -->
+                        <div class="col-12 col-sm-6">
+                            <!-- Macro Target Breakdown Grid -->
+                            <div class="d-flex flex-column gap-2">
+                                <div class="p-2 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #bdf72b;"></span>
+                                            <span class="text-secondary" style="font-size: 12px;">Protein</span>
+                                        </div>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">{{ protein_g }}g <small class="text-muted">({{ protein_kcal }} kcal)</small></div>
+                                    </div>
+                                </div>
+
+                                <div class="p-2 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #557b12;"></span>
+                                            <span class="text-secondary" style="font-size: 12px;">Carbohydrates</span>
+                                        </div>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">{{ carbs_g }}g <small class="text-muted">({{ carbs_kcal }} kcal)</small></div>
+                                    </div>
+                                </div>
+
+                                <div class="p-2 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #94a3b8;"></span>
+                                            <span class="text-secondary" style="font-size: 12px;">Healthy Fats</span>
+                                        </div>
+                                        <div class="fw-bold text-white" style="font-size: 13px;">{{ fat_g }}g <small class="text-muted">({{ fat_kcal }} kcal)</small></div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-1 d-flex align-items-center justify-content-between px-1">
+                                    <span class="text-muted" style="font-size: 11px;">Recommended Focus:</span>
+                                    <span class="text-lime fw-semibold" style="font-size: 11px;">{{ member.recommended_focus|truncatewords:3 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Stacked Mini Cards + Attendance Check-in Wave Chart -->
+            <div class="col-12 col-lg-5">
+                <div class="d-flex flex-column gap-3 h-100">
+                    <!-- 2 Mini Cards Row -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-icon">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div class="mini-stat-label">Gym Sessions:</div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="mini-stat-val">{{ total_checkins }}</span>
+                                    <span class="text-lime" style="font-size: 11px; font-weight: 600;">Active</span>
+                                </div>
+                                <small class="text-muted" style="font-size: 10px;">Total Check-ins</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-icon">
+                                    <i class="fa-solid fa-hourglass-half"></i>
+                                </div>
+                                <div class="mini-stat-label">Plan Days Left:</div>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="mini-stat-val">{{ days_remaining }}</span>
+                                    <span class="text-lime" style="font-size: 11px; font-weight: 600;">Days</span>
+                                </div>
+                                <small class="text-muted" style="font-size: 10px;">Current Membership</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Attendance Activity Pulse Chart -->
+                    <div class="total-profit-card flex-grow-1 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="card-header-title text-white" style="font-size: 14px;">My Weekly Workout Activity:</div>
+                            <div class="total-profit-meta">Weekly session attendance frequency</div>
+                            <div class="total-profit-num" style="color: var(--accent-lime);">{{ monthly_checkins }} Check-ins <small style="font-size: 12px; color: #8b949e; font-weight: normal;">this cycle</small></div>
+                        </div>
+                        <div style="height: 100px; width: 100%;">
+                            <canvas id="memberAttendancePulseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: "WHAT YOU HAVE DONE" (PERSONAL ACTIVITY TIMELINE) + MY PRESCRIBED WORKOUT -->
+        <div class="row g-3">
+            <!-- Left: Personal Activity Feed ("What He Has Done") -->
+            <div class="col-12 col-lg-8">
+                <div class="card-dark h-100">
+                    <div class="card-header-action">
+                        <div>
+                            <h3 class="card-header-title">What You Have Done</h3>
+                            <div class="text-muted" style="font-size: 11px;">Your personal chronological timeline of workout check-ins, payments, and biometrics</div>
+                        </div>
+                        <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: var(--accent-lime); font-size: 11px;">Only Your Activity</span>
+                    </div>
+
+                    <div class="table-responsive mt-2">
+                        <table class="customer-table">
+                            <thead>
+                                <tr>
+                                    <th>Activity & Action</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Status / Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for act in activity_timeline %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="customer-avatar rounded-circle d-flex align-items-center justify-content-center" style="background: rgba(255, 255, 255, 0.05); border: 1px solid {{ act.color }}; color: {{ act.color }}; width: 36px; height: 36px; flex-shrink: 0;">
+                                                <i class="fa-solid {{ act.icon }}" style="font-size: 14px;"></i>
+                                            </div>
+                                            <div class="ms-3">
+                                                <div class="customer-name" style="font-size: 13px;">{{ act.title }}</div>
+                                                <div class="customer-email" style="font-size: 11px;">{{ act.desc }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="background: rgba(255,255,255,0.06); color: #d1d5db; font-size: 11px; border: 1px solid rgba(255,255,255,0.1);">
+                                            {{ act.badge }}
+                                        </span>
+                                    </td>
+                                    <td class="text-secondary small fw-medium">{{ act.date_str }}</td>
+                                    <td>
+                                        <span class="badge" style="background: rgba(189, 247, 43, 0.15); color: var(--accent-lime); font-size: 10px;">
+                                            <i class="fa-solid fa-check me-1"></i> Recorded
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        No recent activities logged yet. Check in to the gym or record a workout!
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: My Prescribed Workout Routine & Quick Actions -->
+            <div class="col-12 col-lg-4">
+                <div class="promo-plan-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="promo-badge">
+                                <i class="fa-solid fa-dumbbell"></i>
+                                <span>Assigned Program</span>
+                            </div>
+                            <span class="badge bg-dark text-lime border border-lime small">{{ exercises_count }} Exercises</span>
+                        </div>
+
+                        <div class="fw-bold text-white fs-6 mb-1">
+                            {{ active_workout.notes|truncatewords:6|default:"Push-Pull-Legs Athletic Split" }}
+                        </div>
+                        <p class="text-secondary small mb-3">
+                            Custom workout prescribed for your BMI {{ member.bmi }} ({{ member.height_cm|floatformat:0 }}cm / {{ member.weight_kg|floatformat:1 }}kg).
+                        </p>
+
+                        <!-- Prescribed Exercise Snapshot -->
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            {% for ex in workout_exercises|slice:":3" %}
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); font-size: 12px;">
+                                <div class="text-white fw-medium text-truncate" style="max-width: 140px;">
+                                    <i class="fa-solid fa-angle-right text-lime me-1"></i> {{ ex.name }}
+                                </div>
+                                <div class="text-muted">
+                                    {{ ex.sets }} sets × {{ ex.reps|default:"10" }} reps
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-muted small">No exercises assigned yet.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2 mt-2">
+                        <a href="{% url 'workouts:workout_list' %}" class="promo-btn-lime text-decoration-none text-center">
+                            Open Full Workout Program <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                        <a href="{% url 'payments:payment_history' %}" class="btn btn-sm btn-outline-secondary text-secondary py-2" style="border-radius: 12px; font-size: 12px;">
+                            <i class="fa-solid fa-receipt me-1"></i> View My Payment Invoices ({{ paid_invoices_count }})
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row g-4 mb-4">
-    <!-- Profile & Subscription Details -->
-    <div class="col-lg-4">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-address-card text-primary me-2"></i>My Profile</h5>
-            <div class="text-center py-2 mb-3">
-                <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center bg-primary text-white mx-auto mb-3" style="width: 70px; height: 70px; font-size: 28px;">
-                    {{ user.username|slice:":1"|upper }}
+    <!-- =========================================================================
+         RIGHT PANEL COLUMN: RECENT GYM VISITS, TRAINER & GYM DESK
+         ========================================================================= -->
+    <div class="col-12 col-xxl-3 col-xl-4 p-0">
+        <div class="right-panel-wrapper h-100">
+            <!-- 1. MY RECENT GYM CHECK-INS -->
+            <div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="right-panel-title m-0">Recent Gym Visits</h4>
+                    <a href="{% url 'attendance:daily_attendance' %}" class="text-lime text-decoration-none small" style="font-size: 11px;">All Visits</a>
                 </div>
-                <h5 class="fw-bold m-0">{{ user.get_full_name|default:user.username }}</h5>
-                <span class="badge bg-success-subtle text-success mt-2 px-3 py-1 text-capitalize">{{ member.status }}</span>
-            </div>
-            
-            <div class="border-top pt-3">
-                <h6 class="fw-bold text-muted small text-uppercase mb-3">Subscription details</h6>
-                {% if current_membership %}
-                    <div class="row small g-2">
-                        <div class="col-6 text-muted">Plan:</div>
-                        <div class="col-6 fw-bold text-end">{{ current_membership.plan.name }}</div>
-                        <div class="col-6 text-muted">Price Paid:</div>
-                        <div class="col-6 fw-bold text-end">₹{{ current_membership.paid_price }}</div>
-                        <div class="col-6 text-muted">End Date:</div>
-                        <div class="col-6 fw-bold text-end text-danger">{{ current_membership.end_date|date:"M d, Y" }}</div>
-                    </div>
-                {% else %}
-                    <div class="alert alert-warning border-0 small m-0 text-center py-2" role="alert">
-                        <i class="fa-solid fa-triangle-exclamation me-1"></i>No active plan. Please renew.
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
 
-    <!-- Active Workout Routine -->
-    <div class="col-lg-4">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-person-running text-success me-2"></i>Active Workout</h5>
-            {% if active_workout %}
-                <p class="small text-muted mb-2">Duration: {{ active_workout.start_date|date:"M d" }} - {{ active_workout.end_date|date:"M d, Y" }}</p>
-                {% if active_workout.notes %}
-                    <div class="bg-light p-2 rounded small mb-3 border-start border-success border-3">
-                        <i class="fa-solid fa-quote-left text-success me-1"></i>{{ active_workout.notes }}
+                {% for att in recent_attendance|slice:":5" %}
+                <div class="activity-item">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 38px; height: 38px; background: rgba(189, 247, 43, 0.1); border: 1px solid rgba(189, 247, 43, 0.3); color: var(--accent-lime); flex-shrink: 0;">
+                        <i class="fa-solid fa-person-running" style="font-size: 13px;"></i>
                     </div>
-                {% endif %}
-                
-                <h6 class="fw-bold small text-muted text-uppercase mb-2">Exercises</h6>
-                <ul class="list-group list-group-flush">
-                    {% for exercise in active_workout.exercises.all %}
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center small">
+                    <div class="ms-2">
+                        <div class="activity-text"><strong class="text-white">{{ att.date|date:"l, M d" }}</strong></div>
+                        <div class="activity-time text-secondary" style="font-size: 11px;">
+                            Check-in: {{ att.check_in_time|time:"h:i A"|default:"Morning Session" }} 
+                            <span class="badge bg-success text-dark ms-1" style="font-size: 9px;">Attended</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-muted small py-2">No attendance records found.</div>
+                {% endfor %}
+            </div>
+
+            <!-- 2. MY ASSIGNED TRAINER & SUPPORT (Personal to this member) -->
+            <div class="mt-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="right-panel-title m-0">My Assigned Trainer</h4>
+                </div>
+
+                <div class="contacts-list">
+                    <!-- Trainer Contact Item -->
+                    <div class="contact-item active">
+                        <div class="contact-info">
+                            <div class="customer-avatar rounded-circle d-flex align-items-center justify-content-center bg-dark text-lime fw-bold border border-lime" style="width: 40px; height: 40px;">
+                                {{ trainer.user.get_full_name|default:"Alex Rivera"|slice:":1" }}
+                            </div>
                             <div>
-                                <span class="fw-semibold">{{ exercise.name }}</span>
-                                <span class="text-muted d-block text-capitalize" style="font-size: 11px;">{{ exercise.get_category_display }}</span>
-                            </div>
-                            <div class="text-end">
-                                {% if exercise.reps %}
-                                    <span class="badge bg-secondary-subtle text-secondary">{{ exercise.sets }} x {{ exercise.reps }} reps</span>
-                                {% endif %}
-                                {% if exercise.weight_kg %}
-                                    <span class="badge bg-indigo-subtle text-indigo d-block mt-1">{{ exercise.weight_kg }} kg</span>
-                                {% endif %}
-                                {% if exercise.duration_minutes %}
-                                    <span class="badge bg-info-subtle text-info">{{ exercise.duration_minutes }} mins</span>
-                                {% endif %}
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item px-0 py-2 text-center text-muted small">No exercises assigned.</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div class="my-auto text-center py-4 text-muted">
-                    <i class="fa-solid fa-person-running fa-3x mb-3 text-light-muted"></i>
-                    <p class="m-0 small">No workout routine assigned by your coach yet.</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Diet & Meal Schedule -->
-    <div class="col-lg-4">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-apple-whole text-warning me-2"></i>Diet & Macros</h5>
-            {% if active_diet %}
-                <div class="row g-2 mb-3 text-center">
-                    <div class="col-3">
-                        <div class="border rounded py-2 bg-light-subtle">
-                            <span class="fw-bold text-primary">{{ active_diet.daily_calories }}</span>
-                            <span class="text-muted d-block" style="font-size: 10px;">kcal</span>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="border rounded py-2 bg-light-subtle">
-                            <span class="fw-bold text-success">{{ active_diet.protein_g }}g</span>
-                            <span class="text-muted d-block" style="font-size: 10px;">Protein</span>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="border rounded py-2 bg-light-subtle">
-                            <span class="fw-bold text-info">{{ active_diet.carbs_g }}g</span>
-                            <span class="text-muted d-block" style="font-size: 10px;">Carbs</span>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <div class="border rounded py-2 bg-light-subtle">
-                            <span class="fw-bold text-warning">{{ active_diet.fat_g }}g</span>
-                            <span class="text-muted d-block" style="font-size: 10px;">Fat</span>
-                        </div>
-                    </div>
-                </div>
-
-                <h6 class="fw-bold small text-muted text-uppercase mb-2">Meal Schedule</h6>
-                <div class="accordion accordion-flush" id="mealScheduleAccordion">
-                    {% for meal, description in active_diet.meal_schedule.items %}
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
-                            <button class="accordion-button collapsed py-2 px-0 small fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="false">
-                                {{ meal|capfirst }}
-                            </button>
-                        </h2>
-                        <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#mealScheduleAccordion">
-                            <div class="accordion-body px-0 py-2 small text-muted">
-                                {{ description }}
+                                <span class="contact-name text-white">{{ trainer.user.get_full_name|default:"Alex Rivera" }}</span>
+                                <div class="text-muted" style="font-size: 11px;">{{ trainer.specialization|default:"Head Fitness Coach" }}</div>
                             </div>
                         </div>
+                        <div class="contact-actions">
+                            <a href="tel:{{ trainer.user.phone|default:'+919876543210' }}" class="contact-action-btn text-decoration-none" title="Call Trainer"><i class="fa-solid fa-phone"></i></a>
+                            <a href="mailto:{{ trainer.user.email|default:'trainer@musclenfitness.com' }}" class="contact-action-btn text-decoration-none" title="Email Trainer"><i class="fa-solid fa-envelope"></i></a>
+                        </div>
                     </div>
-                    {% empty %}
-                        <p class="text-center text-muted small py-3">No meal schedule details found.</p>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="my-auto text-center py-4 text-muted">
-                    <i class="fa-solid fa-apple-whole fa-3x mb-3 text-light-muted"></i>
-                    <p class="m-0 small">No diet planner assigned by your coach yet.</p>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
 
-<!-- Transactions & Attendance History -->
-<div class="row g-4">
-    <!-- Attendance Logs -->
-    <div class="col-xl-6">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-calendar-check text-success me-2"></i>My Attendance Logs</h5>
-            <div class="table-responsive">
-                <table class="table align-middle text-nowrap">
-                    <thead class="table-light-head">
-                        <tr>
-                            <th>Date</th>
-                            <th>Check-In</th>
-                            <th>Check-Out</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in recent_attendance %}
-                        <tr>
-                            <td>{{ record.date|date:"D, M d, Y" }}</td>
-                            <td>{{ record.check_in_time|default:"-" }}</td>
-                            <td>{{ record.check_out_time|default:"-" }}</td>
-                            <td>
-                                {% if record.status == 'present' %}
-                                    <span class="badge bg-success-subtle text-success">Present</span>
-                                {% else %}
-                                    <span class="badge bg-danger-subtle text-danger">Absent</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No attendance checks registered yet.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    <!-- Gym Front Desk Contact -->
+                    <div class="contact-item mt-2">
+                        <div class="contact-info">
+                            <div class="customer-avatar rounded-circle d-flex align-items-center justify-content-center bg-dark text-secondary border border-secondary" style="width: 40px; height: 40px;">
+                                <i class="fa-solid fa-dumbbell"></i>
+                            </div>
+                            <div>
+                                <span class="contact-name text-white">Muscle n Fitness Desk</span>
+                                <div class="text-muted" style="font-size: 11px;">Main Reception & Helpdesk</div>
+                            </div>
+                        </div>
+                        <button class="contact-more-btn" title="Front Desk"><i class="fa-solid fa-circle-info"></i></button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Payments Ledger -->
-    <div class="col-xl-6">
-        <div class="card card-premium border-0 shadow-sm p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i>My Payment Receipts</h5>
-            <div class="table-responsive">
-                <table class="table align-middle text-nowrap">
-                    <thead class="table-light-head">
-                        <tr>
-                            <th>Invoice ID</th>
-                            <th>Amount</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for payment in payments %}
-                        <tr>
-                            <td class="fw-bold text-primary">{{ payment.invoice_number }}</td>
-                            <td>₹{{ payment.amount }}</td>
-                            <td>{{ payment.payment_date|date:"M d, Y" }}</td>
-                            <td>
-                                {% if payment.payment_status == 'paid' %}
-                                    <span class="badge bg-success-subtle text-success">Paid</span>
-                                {% else %}
-                                    <span class="badge bg-warning-subtle text-warning">Pending</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No billing records found.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <!-- 3. DAILY HYDRATION & RECOVERY CHECKLIST -->
+            <div class="mt-4 p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="fa-solid fa-bottle-water text-info" style="font-size: 14px;"></i>
+                    <span class="text-white fw-semibold small">Daily Recovery Targets</span>
+                </div>
+                <div class="d-flex flex-column gap-2" style="font-size: 11px;">
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Hydration Goal:</span>
+                        <span class="text-white fw-bold">3.5 Liters / Day</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Sleep Recommendation:</span>
+                        <span class="text-white fw-bold">7.5 - 8 Hours</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-secondary">
+                        <span>Gym Peak Hours:</span>
+                        <span class="text-lime fw-bold">06:00 AM - 10:00 PM</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Personal Diet Macros Donut Chart
+    const dietCtx = document.getElementById('memberDietDonutChart');
+    if (dietCtx) {
+        new Chart(dietCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Protein (kcal)', 'Carbs (kcal)', 'Fats (kcal)'],
+                datasets: [{
+                    data: [{{ protein_kcal }}, {{ carbs_kcal }}, {{ fat_kcal }}],
+                    backgroundColor: [
+                        '#bdf72b', // Neon lime (Protein)
+                        '#557b12', // Olive lime (Carbs)
+                        '#94a3b8'  // Slate grey (Fats)
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '76%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#15181e',
+                        titleColor: '#fff',
+                        bodyColor: '#bdf72b',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.label + ': ' + context.parsed + ' kcal';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Personal Attendance Pulse Glowing Wave Chart
+    const pulseCtx = document.getElementById('memberAttendancePulseChart');
+    if (pulseCtx) {
+        const ctx2d = pulseCtx.getContext('2d');
+        const gradient = ctx2d.createLinearGradient(0, 0, 0, 100);
+        gradient.addColorStop(0, 'rgba(189, 247, 43, 0.45)');
+        gradient.addColorStop(0.7, 'rgba(16, 185, 129, 0.1)');
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+        new Chart(pulseCtx, {
+            type: 'line',
+            data: {
+                labels: {{ attendance_labels|safe }},
+                datasets: [{
+                    data: {{ attendance_data|safe }},
+                    borderColor: '#bdf72b',
+                    borderWidth: 2.5,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#bdf72b',
+                    tension: 0.45,
+                    fill: true,
+                    backgroundColor: gradient
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: '#15181e',
+                        titleColor: '#fff',
+                        bodyColor: '#bdf72b',
+                        borderColor: 'rgba(189,247,43,0.3)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                return ' Sessions: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: { color: '#6b7280', font: { size: 10 } }
+                    },
+                    y: {
+                        display: false,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

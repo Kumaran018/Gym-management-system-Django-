@@ -1,100 +1,134 @@
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
-    <div class="container-fluid p-0 d-flex justify-content-between align-items-center">
-        <!-- Breadcrumb & Collapse Trigger -->
-        <div class="d-flex align-items-center gap-3">
-            <button class="btn-nav-widget" id="menu-toggle">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            
-            <nav aria-label="breadcrumb" class="d-none d-md-block">
-                <ol class="breadcrumb m-0 small font-weight-bold" style="font-size: 13px;">
-                    <li class="breadcrumb-item text-muted">Muscle Fit Gym</li>
-                    <li class="breadcrumb-item text-dark text-capitalize active" aria-current="page">
-                        {{ request.resolver_match.url_name|default:"Dashboard"|title }}
-                    </li>
-                </ol>
-            </nav>
-        </div>
-
-        <!-- Search Bar -->
-        <form class="d-none d-xl-flex search-form ms-3" style="width: 320px;" role="search">
-            <div class="input-group">
-                <span class="input-group-text bg-transparent border-end-0">
-                    <i class="fa-solid fa-magnifying-glass text-muted"></i>
-                </span>
-                <input class="form-control border-start-0 ps-0" type="search" placeholder="Search members, transactions..." aria-label="Search">
-            </div>
-        </form>
-
-        <!-- Right Widgets -->
-        <div class="d-flex align-items-center gap-2">
-            <!-- Current Date (Premium Feature) -->
-            <span class="text-muted small d-none d-xl-inline-block font-weight-bold me-2" style="font-size: 12px;">
-                <i class="fa-solid fa-calendar me-1"></i>{% now "l, F d, Y" %}
-            </span>
-
-            <!-- Quick Add Dropdown -->
-            {% if user.role == 'admin' or user.role == 'receptionist' %}
-            <div class="dropdown">
-                <button class="btn btn-premium btn-sm rounded-pill px-3 py-1.5 dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fa-solid fa-plus me-1"></i>Quick Add
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2">
-                    <li><a class="dropdown-item py-2" href="{% url 'members:add' %}"><i class="fa-solid fa-user-plus me-2 text-primary"></i>Add Member</a></li>
-                    <li><a class="dropdown-item py-2" href="{% url 'payments:record_payment' %}"><i class="fa-solid fa-circle-dollar-to-slot me-2 text-success"></i>Collect Payment</a></li>
-                    {% if user.role == 'admin' %}
-                        <li><a class="dropdown-item py-2" href="{% url 'membership:plan_add' %}"><i class="fa-solid fa-tags me-2 text-warning"></i>Create Plan</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-            {% endif %}
-
-            <!-- Messaging Widget -->
-            <a href="{% url 'notifications:list_notifications' %}" class="btn-nav-widget" title="Inbox Messages">
-                <i class="fa-solid fa-envelope"></i>
-            </a>
-
-            <!-- Notification Widget -->
-            <a href="{% url 'notifications:list_notifications' %}" class="btn-nav-widget position-relative" title="Notifications">
-                <i class="fa-solid fa-bell"></i>
-                <span class="position-absolute top-1 start-1 translate-middle badge rounded-pill bg-danger" style="font-size: 8px; padding: 3px 5px;">
-                    3
-                </span>
-            </a>
-
-            <!-- Theme Toggle Widget -->
-            <button class="btn-nav-widget" id="theme-toggle" title="Switch Theme">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-
-            <!-- User Menu Trigger -->
-            {% if user.is_authenticated %}
-            <div class="dropdown ms-1">
-                <a class="profile-dropdown-trigger d-flex align-items-center gap-2 nav-link dropdown-toggle text-dark fw-bold" href="#" data-bs-toggle="dropdown">
-                    {% if user.profile_picture %}
-                        <img src="{{ user.profile_picture.url }}" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
-                    {% else %}
-                        <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 30px; height: 30px; font-size: 13px;">
-                            {{ user.username|slice:":1"|upper }}
-                        </div>
-                    {% endif %}
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="width: 220px;">
-                    <li class="px-3 py-2 border-bottom mb-2">
-                        <h6 class="m-0 fw-bold text-dark">{{ user.get_full_name|default:user.username }}</h6>
-                        <small class="text-muted text-truncate d-block" style="font-size: 11px;">{{ user.email|default:"No email set" }}</small>
-                    </li>
-                    <li><a class="dropdown-item py-2" href="{% url 'notifications:list_notifications' %}"><i class="fa-solid fa-bell me-2 text-muted"></i>My Alerts</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <form action="{% url 'authentication:logout' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item py-2 text-danger rounded"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-            {% endif %}
+{% load static %}
+<header class="topbar-exact">
+    <!-- Left: Breadcrumb Navigation (Exact Screenshot) -->
+    <div class="topbar-breadcrumb">
+        <button class="topbar-btn d-lg-none" id="menu-toggle" type="button">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <span class="topbar-icon-action" title="Workspace Layers">
+            <i class="fa-solid fa-layer-group"></i>
+        </span>
+        <span class="topbar-icon-action" title="Bookmark">
+            <i class="fa-regular fa-star"></i>
+        </span>
+        <div class="breadcrumb-trail">
+            <span>Dashboards</span>
+            <span class="text-muted">/</span>
+            <span class="active">{{ request.resolver_match.url_name|default:"Overview"|title }}</span>
         </div>
     </div>
-</nav>
+
+    <!-- Right: Quick Action Widgets (Exact Screenshot) -->
+    <div class="topbar-actions">
+        <!-- Moon / Dark Mode Icon -->
+        <button class="topbar-btn" id="theme-toggle" title="Toggle Theme">
+            <i class="fa-regular fa-moon"></i>
+        </button>
+
+        <!-- Refresh / Sync Icon -->
+        <button class="topbar-btn" onclick="window.location.reload();" title="Refresh Dashboard">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
+
+        <!-- Bell Notification Dropdown (Inside top notification icon) -->
+        <div class="dropdown">
+            <button class="topbar-btn dropdown-toggle position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications" style="border: none; background: transparent; cursor: pointer;">
+                <i class="fa-regular fa-bell"></i>
+                {% if nav_total_notifications > 0 %}
+                    <span class="topbar-badge-dot" style="background-color: var(--accent-lime); width: 8px; height: 8px; border-radius: 50%; position: absolute; top: 6px; right: 6px; box-shadow: 0 0 6px rgba(189, 247, 43, 0.8);"></span>
+                {% endif %}
+            </button>
+            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0" aria-labelledby="notifDropdown" style="width: 360px; max-width: 90vw; background: #15181e; border: 1px solid rgba(255, 255, 255, 0.08) !important; border-radius: 14px; overflow: hidden; z-index: 1060; margin-top: 8px;">
+                <!-- Header -->
+                <div class="d-flex align-items-center justify-content-between p-3 border-bottom" style="border-color: rgba(255, 255, 255, 0.06) !important; background: rgba(0, 0, 0, 0.2);">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-white" style="font-size: 14px;">Notifications</span>
+                        <span class="badge rounded-pill" style="background: rgba(189, 247, 43, 0.15); color: var(--accent-lime); border: 1px solid rgba(189, 247, 43, 0.3); font-size: 10px;">{{ nav_total_notifications }}</span>
+                    </div>
+                    {% if nav_unread_count > 0 %}
+                    <a href="{% url 'notifications:mark_all_as_read' %}" class="text-lime text-decoration-none" style="font-size: 11px; font-weight: 500;">
+                        Mark all as read
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Notifications Scroll List -->
+                <div style="max-height: 360px; overflow-y: auto;">
+                    {% for notif in nav_notifications %}
+                    <a href="{% url 'notifications:mark_as_read' notif.pk %}" class="d-flex align-items-start gap-3 p-3 text-decoration-none border-bottom" style="border-color: rgba(255, 255, 255, 0.04) !important; background: {% if not notif.is_read %}rgba(189, 247, 43, 0.03){% else %}transparent{% endif %}; transition: background 0.15s ease;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);">
+                            {% if notif.notification_type == 'payment' %}
+                                <i class="fa-solid fa-credit-card" style="color: #38bdf8; font-size: 13px;"></i>
+                            {% elif notif.notification_type == 'welcome' %}
+                                <i class="fa-solid fa-hand-peace" style="color: var(--accent-lime); font-size: 13px;"></i>
+                            {% elif notif.notification_type == 'trainer' %}
+                                <i class="fa-solid fa-dumbbell" style="color: #f59e0b; font-size: 13px;"></i>
+                            {% else %}
+                                <i class="fa-solid fa-bell" style="color: var(--accent-lime); font-size: 13px;"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <div class="text-white fw-semibold text-truncate" style="font-size: 12px; max-width: 200px;">{{ notif.title }}</div>
+                                <span class="text-muted" style="font-size: 10px;">{{ notif.created_at|timesince }} ago</span>
+                            </div>
+                            <div class="text-secondary text-truncate" style="font-size: 11px;" title="{{ notif.message }}">{{ notif.message }}</div>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="fa-regular fa-bell-slash mb-2 fs-5 d-block text-secondary"></i>
+                        No notifications right now.
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Footer -->
+                <div class="p-2 text-center border-top" style="border-color: rgba(255, 255, 255, 0.06) !important; background: rgba(0, 0, 0, 0.25);">
+                    <a href="{% url 'notifications:list_notifications' %}" class="text-secondary hover-lime text-decoration-none small fw-semibold" style="font-size: 11px;">
+                        View All Notifications <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Globe / Language Icon -->
+        <button class="topbar-btn" title="Switch Language">
+            <i class="fa-solid fa-globe"></i>
+        </button>
+
+        <!-- User Dropdown Menu -->
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center dropdown-toggle text-decoration-none" data-bs-toggle="dropdown">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="User" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid var(--border-medium);">
+                {% else %}
+                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; background: #1f2530; color: var(--accent-lime); font-size: 13px; border: 1px solid var(--border-medium);">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="background: var(--bg-card); border: 1px solid var(--border-subtle) !important; border-radius: var(--radius-md);">
+                <li class="px-3 py-2 border-bottom mb-2" style="border-color: var(--border-subtle) !important;">
+                    <div class="fw-bold text-white small">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="text-muted" style="font-size: 11px;">{{ user.email|default:"Logged in user" }}</div>
+                </li>
+                <li><a class="dropdown-item text-secondary py-2 small" href="{% url 'core:home' %}"><i class="fa-solid fa-house me-2 text-lime"></i>Home Showcase</a></li>
+                <li><a class="dropdown-item text-secondary py-2 small" href="{% url 'dashboard:system_settings' %}"><i class="fa-solid fa-gear me-2"></i>System Settings</a></li>
+                <li><hr class="dropdown-divider" style="border-color: var(--border-subtle);"></li>
+                <li>
+                    <form action="{% url 'authentication:logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item text-danger py-2 small"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'authentication:login' %}" class="btn-lime btn-sm py-1 px-3">
+            Sign In
+        </a>
+        {% endif %}
+    </div>
+</header>
